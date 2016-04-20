@@ -1,6 +1,7 @@
 import os
 import subprocess
 
+import click
 
 
 def call_and_error(seq):
@@ -27,3 +28,8 @@ def get_repo_name():
 
 def get_branches():
     return call(['git', 'branch'])
+
+
+def error_out(msg):
+    click.echo(click.style(msg, fg='red'))
+    raise click.Abort

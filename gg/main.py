@@ -1,8 +1,6 @@
 import os
 import click
 
-# from .lib import config
-# from .commands import start
 from . import state
 
 DEFAULT_CONFIG_FILE = os.path.expanduser('~/.gg.json')
@@ -14,7 +12,6 @@ class Config(object):
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
 
-# @click.command()
 @click.group()
 @click.option(
     '-v', '--verbose',
@@ -34,10 +31,6 @@ def cli(config, configfile, verbose):
     if not os.path.isfile(configfile):
         state.write(configfile, {})
 
-
-
-# cli.add_command(config.initdb)
-# cli.add_command(start.start)
 
 # replace this with some entry_point loading magic
 from .commands import start
