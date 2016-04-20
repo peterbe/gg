@@ -1,5 +1,3 @@
-import datetime
-
 import click
 
 from gg.utils import call_and_error, get_repo_name, get_branches
@@ -48,7 +46,6 @@ def start(config, bugnumber=''):
         return string.lower().strip()
 
     branchname += clean_branchname(description)
-    print("CONFIG", config.configfile)
-    # print(call_and_error('git checkout -b "{}"'.format(branchname)))
+    print(call_and_error('git checkout -b "{}"'.format(branchname)))
 
     save(config.configfile, description, branchname, bugnumber)
