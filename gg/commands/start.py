@@ -27,11 +27,11 @@ def start(config, bugnumber=''):
     # click.echo(repr(get_repo_name()))
     # click.echo(description)
 
-    branchname = ''
+    branch_name = ''
     if bugnumber:
-        branchname = 'bug-{}-'.format(bugnumber)
+        branch_name = 'bug-{}-'.format(bugnumber)
 
-    def clean_branchname(string):
+    def clean_branch_name(string):
         string = (
             string
             .replace('   ', ' ')
@@ -45,7 +45,7 @@ def start(config, bugnumber=''):
             string = string.replace(each, '')
         return string.lower().strip()
 
-    branchname += clean_branchname(description)
-    print(call_and_error('git checkout -b "{}"'.format(branchname)))
+    branch_name += clean_branch_name(description)
+    out, err = call_and_error(['git', 'checkout', '-b', branch_name)
 
-    save(config.configfile, description, branchname, bugnumber)
+    save(config.configfile, description, branch_name, bugnumber)
