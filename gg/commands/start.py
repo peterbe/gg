@@ -1,9 +1,11 @@
+import datetime
+
 import click
 
 from gg.utils import call_and_error, get_repo_name, get_branches
 from gg.state import save
-
 from gg.main import cli, pass_config
+
 
 @cli.command()
 @click.argument('bugnumber', default='')

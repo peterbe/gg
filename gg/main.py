@@ -3,7 +3,7 @@ import click
 
 # from .lib import config
 # from .commands import start
-
+from . import state
 
 DEFAULT_CONFIG_FILE = os.path.expanduser('~/.gg.json')
 
@@ -31,6 +31,9 @@ def cli(config, configfile, verbose):
     and Bugzilla much easier."""
     config.verbose = verbose
     config.configfile = configfile
+    if not os.path.isfile(configfile):
+        state.write(configfile, {})
+
 
 
 # cli.add_command(config.initdb)
