@@ -5,12 +5,15 @@ from . import state
 
 DEFAULT_CONFIG_FILE = os.path.expanduser('~/.gg.json')
 
+
 class Config(object):
     def __init__(self):
         self.verbose = False  # default
         self.config_file = DEFAULT_CONFIG_FILE
 
+
 pass_config = click.make_pass_decorator(Config, ensure=True)
+
 
 @click.group()
 @click.option(
@@ -33,4 +36,4 @@ def cli(config, configfile, verbose):
 
 
 # replace this with some entry_point loading magic
-from .commands import start
+# from .commands import start
