@@ -1,9 +1,8 @@
 from setuptools import setup, find_packages
 
-print("PACKAGES", find_packages())
 setup(
     name='gg',
-    version='0.0.1',
+    version='0.0.2',
     author='Peter Bengtsson',
     author_email='mail@peterbe.com',
     url='https://github.com/peterbe/gg',
