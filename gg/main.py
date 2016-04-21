@@ -1,4 +1,6 @@
 import os
+from pkg_resources import iter_entry_points
+
 import click
 
 from . import state
@@ -35,5 +37,8 @@ def cli(config, configfile, verbose):
         state.write(configfile, {})
 
 
-# replace this with some entry_point loading magic
-# from .commands import start
+# Simply loading all installed packages that have this entry_point
+# will be enough. Each plugin automatically registers itself with the
+# cli click group.
+for entry_point in iter_entry_points(group='gg.plugin', name=None):
+    entry_point.load()
