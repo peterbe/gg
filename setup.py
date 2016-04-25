@@ -14,6 +14,7 @@ setup(
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
+    zip_safe=False,
     install_requires=[
         'click',
         'colorama',
@@ -22,4 +23,6 @@ setup(
         [console_scripts]
         gg=gg.main:cli
     """,
+    setup_requires=['pytest-runner'],
+    tests_require=['pytest'],
 )

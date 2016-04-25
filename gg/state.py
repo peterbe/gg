@@ -8,18 +8,19 @@ def read(configfile):
     with open(configfile, 'r') as f:
         return json.load(f)
 
+
 def write(configfile, data):
     with open(configfile, 'w') as f:
         json.dump(data, f)
 
 
-def save(configfile, description, branch_name, bugnumber):
+def save(configfile, description, branch_name, **extra):
     state = read(configfile)
     repo_name = get_repo_name()
     key = '{}:{}'.format(repo_name, branch_name)
-    state[key] = {
+    state[key] = extra
+    state[key].update({
         'description': description,
-        'bugnumber': bugnumber,
         'date': datetime.datetime.now().isoformat(),
-    }
+    })
     write(configfile, state)

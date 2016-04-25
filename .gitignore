@@ -1,3 +1,5 @@
 gg.egg-info/
 dist/
 build/
+.cache/
+.eggs/
