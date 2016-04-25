@@ -1,4 +1,7 @@
+from os import path
 from setuptools import setup, find_packages
+
+_here = path.dirname(__file__)
 
 setup(
     name='gg',
@@ -6,7 +9,8 @@ setup(
     author='Peter Bengtsson',
     author_email='mail@peterbe.com',
     url='https://github.com/peterbe/gg',
-    description='Git and GitHub command line swiss army knife',
+    description='Git and GitHub for the productivity addicted',
+    long_description=open(path.join(_here, 'README.rst')).read(),
     license='MIT',
     packages=find_packages(),
     include_package_data=True,
