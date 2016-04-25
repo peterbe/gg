@@ -2,6 +2,11 @@
 gg
 ==
 
+.. image:: https://travis-ci.org/peterbe/gg.svg?branch=master
+    :target: https://travis-ci.org/peterbe/gg
+
+.. image:: https://badge.fury.io/py/gg.svg
+    :target: https://pypi.python.org/pypi/gg
 
 Git and GitHub command line swiss army knife for the productivity addicted.
 
