@@ -39,6 +39,17 @@ Next, you need to install some plugins. See
 `PLUGINS.rst <https://github.com/peterbe/gg/blob/master/PLUGINS.rst>`_
 for a list of available plugins.
 
+Bash completion
+===============
+
+First download
+`gg-complete.sh <https://raw.githubusercontent.com/peterbe/gg/master/gg-complete.sh>`_
+and save it somewhere on your computer. Then put this line into your `.bashrc`
+(or `.bash_profile` if you're on OSX)::
+
+    source /path/to/gg-complete.sh
+
+
 How to develop
 ==============
 
