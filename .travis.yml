@@ -1,0 +1,30 @@
+# https://travis-ci.org/peterbe/premailer
+
+# This indicates to Travis that we will not use or need sudo
+# so that we can benefit from and use the cache->directories
+# directive.
+sudo: no
+
+language: python
+
+before_install:
+  # twine is necessary so that travis can deploy
+  - travis_retry pip install twine
+  - travis_retry pip install tox
+
+install:
+  - travis_retry python setup.py install
+
+python: 3.5
+
+env:
+  - TOX_ENV=flake8
+  #- TOX_ENV=py27
+  - TOX_ENV=py35
+
+script:
+  - tox -e $TOX_ENV
+
+branches:
+  only:
+  - master
