@@ -5,13 +5,19 @@ import click
 
 from . import state
 
-DEFAULT_CONFIG_FILE = os.path.expanduser('~/.gg.json')
+DEFAULT_CONFIG_FILE = '~/.gg.json'
 
 
 class Config(object):
     def __init__(self):
         self.verbose = False  # default
-        self.config_file = DEFAULT_CONFIG_FILE
+        # The reason for making this depend on possible an OS
+        # environment variable is so that tests of plugins can
+        # override the default.
+        self.config_file = os.path.expanduser(os.environ.get(
+            'GG_DEFAULT_CONFIG_FILE',
+            DEFAULT_CONFIG_FILE
+        ))
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
@@ -23,7 +29,7 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
     is_flag=True
 )
 @click.option(
-    '--configfile',
+    '-c', '--configfile',
     default=DEFAULT_CONFIG_FILE,
     help='Path to the config file'
 )

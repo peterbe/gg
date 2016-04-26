@@ -11,7 +11,7 @@ def read(configfile):
 
 def write(configfile, data):
     with open(configfile, 'w') as f:
-        json.dump(data, f)
+        json.dump(data, f, indent=2, sort_keys=True)
 
 
 def save(configfile, description, branch_name, **extra):
