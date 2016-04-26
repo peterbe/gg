@@ -5,7 +5,7 @@ import click
 
 from . import state
 
-DEFAULT_CONFIG_FILE = '~/.gg.json'
+DEFAULT_CONFIG_FILE = os.path.expanduser('~/.gg.json')
 
 
 class Config(object):
@@ -14,10 +14,10 @@ class Config(object):
         # The reason for making this depend on possible an OS
         # environment variable is so that tests of plugins can
         # override the default.
-        self.config_file = os.path.expanduser(os.environ.get(
+        self.config_file = os.environ.get(
             'GG_DEFAULT_CONFIG_FILE',
             DEFAULT_CONFIG_FILE
-        ))
+        )
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
