@@ -5,19 +5,13 @@ import click
 
 from . import state
 
-# The reason for making this depend on possible an OS
-# environment variable is so that tests of plugins can
-# override the default.
-DEFAULT_CONFIG_FILE = os.path.expanduser(os.environ.get(
-    'GG_DEFAULT_CONFIG_FILE',
-    '~/.gg.json'
-))
+DEFAULT_CONFIGFILE = os.path.expanduser('~/.gg.json')
 
 
 class Config(object):
     def __init__(self):
         self.verbose = False  # default
-        self.config_file = DEFAULT_CONFIG_FILE
+        self.configfile = DEFAULT_CONFIGFILE
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
@@ -30,8 +24,8 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 )
 @click.option(
     '-c', '--configfile',
-    default=DEFAULT_CONFIG_FILE,
-    help='Path to the config file (default: {})'.format(DEFAULT_CONFIG_FILE)
+    default=DEFAULT_CONFIGFILE,
+    help='Path to the config file (default: {})'.format(DEFAULT_CONFIGFILE)
 )
 @pass_config
 def cli(config, configfile, verbose):
