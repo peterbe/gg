@@ -37,6 +37,9 @@ def cli(config, configfile, verbose):
         state.write(configfile, {})
 
 
+# load in the builtin apps
+from .builtins import bugzilla  # NOQA
+
 # Simply loading all installed packages that have this entry_point
 # will be enough. Each plugin automatically registers itself with the
 # cli click group.
