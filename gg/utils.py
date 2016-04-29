@@ -33,3 +33,11 @@ def get_branches():
 def error_out(msg):
     click.echo(click.style(msg, fg='red'))
     raise click.Abort
+
+
+def success_out(msg):
+    click.echo(click.style(msg, fg='green'))
+
+
+def info_out(msg):
+    click.echo(msg)

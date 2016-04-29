@@ -15,12 +15,24 @@ def write(configfile, data):
 
 
 def save(configfile, description, branch_name, **extra):
-    state = read(configfile)
+    # state = read(configfile)
     repo_name = get_repo_name()
     key = '{}:{}'.format(repo_name, branch_name)
-    state[key] = extra
-    state[key].update({
+    new = {key: extra}
+    new[key].update({
         'description': description,
         'date': datetime.datetime.now().isoformat(),
     })
+    update(configfile, new)
+
+
+def update(configfile, data):
+    state = read(configfile)
+    state.update(data)
+    write(configfile, state)
+
+
+def remove(configfile, key):
+    state = read(configfile)
+    del state[key]
     write(configfile, state)

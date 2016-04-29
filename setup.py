@@ -18,11 +18,12 @@ setup(
     install_requires=[
         'click',
         'colorama',
+        'requests',
     ],
     entry_points="""
         [console_scripts]
         gg=gg.main:cli
     """,
     setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'pytest-mock'],
 )
