@@ -1,33 +1,11 @@
 import json
-import os
-import tempfile
 
-import pytest
 from click.testing import CliRunner
 
 from gg.main import Config
 from gg.builtins import bugzilla
 
-
-@pytest.fixture()
-def temp_configfile(request):
-    cf = os.path.join(tempfile.gettempdir(), 'config.json')
-    with open(cf, 'w') as f:
-        json.dump({}, f)
-
-    def teardown():
-        os.remove(cf)
-    request.addfinalizer(teardown)
-    return cf
-
-
-class Response:
-    def __init__(self, content, status_code=200):
-        self.content = content
-        self.status_code = status_code
-
-    def json(self):
-        return self.content
+from gg.testing import Response
 
 
 def test_login(temp_configfile, mocker):
