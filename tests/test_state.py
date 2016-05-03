@@ -1,22 +1,6 @@
-import os
-import tempfile
 import json
 
-import pytest
-
 from gg import state
-
-
-@pytest.fixture()
-def temp_configfile(request):
-    cf = os.path.join(tempfile.gettempdir(), 'config.json')
-    with open(cf, 'w') as f:
-        json.dump({}, f)
-
-    def teardown():
-        os.remove(cf)
-    request.addfinalizer(teardown)
-    return cf
 
 
 def test_save(temp_configfile):
