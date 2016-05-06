@@ -108,7 +108,6 @@ def get_summary(config, bugnumber):
     response = requests.get(url, params=params)
     if response.status_code == 200:
         return response.json()['bugs'][0]['summary']
-        # success_out(bug['summary'])
 
 
 @bugzilla.command()
