@@ -1,33 +1,20 @@
 import os
-import subprocess
 
 import click
+import git
 
 
-def call_and_error(seq):
-    """Use Popen to execute `seq` and return stdout."""
-    if isinstance(seq, str):
-        seq = seq.split()
-    out, err = subprocess.Popen(
-        seq,
-        stdout=subprocess.PIPE,
-        # stderr=and_print and subprocess.STDOUT or subprocess.PIPE
-        stderr=subprocess.PIPE
-    ).communicate()
-    return out.decode('utf-8'), err.decode('utf-8')
-
-
-def call(seq):
-    return call_and_error(seq)[0]
+def get_repo(here='.'):
+    if os.path.abspath(here) == '/':  # hit rock bottom
+        raise git.InvalidGitRepositoryError('Unable to find repo root')
+    if os.path.isdir(os.path.join(here, '.git')):
+        return git.Repo(here)
+    return get_repo(os.path.join(here, '..'))
 
 
 def get_repo_name():
-    d = call('git rev-parse --show-toplevel').strip()
-    return os.path.split(d)[-1].strip()
-
-
-def get_branches():
-    return call(['git', 'branch'])
+    repo = get_repo()
+    return os.path.basename(repo.working_dir)
 
 
 def error_out(msg):

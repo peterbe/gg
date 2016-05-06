@@ -3,9 +3,10 @@ from setuptools import setup, find_packages
 
 _here = path.dirname(__file__)
 
+
 setup(
     name='gg',
-    version='0.0.9',
+    version='0.0.10',
     author='Peter Bengtsson',
     author_email='mail@peterbe.com',
     url='https://github.com/peterbe/gg',
@@ -19,6 +20,7 @@ setup(
         'click',
         'colorama',
         'requests',
+        'GitPython',
     ],
     entry_points="""
         [console_scripts]
