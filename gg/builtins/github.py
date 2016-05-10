@@ -107,9 +107,11 @@ def get_title(config, org, repo, number):
     assert url.startswith('https://'), url
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
-        return response.json()['title']
+        data = response.json()
+        return data['title'], data['html_url']
     if config.verbose:
         info_out('GitHub Response: {}'.format(response))
+    return None, None
 
 
 @github.command()
@@ -132,7 +134,7 @@ def test(config, issue_url):
             'https://github.com/([^/]+)/([^/]+)/issues/(\d+)'
         )
         org, repo, number = github_url_regex.search(issue_url).groups()
-        title = get_title(config, org, repo, number)
+        title, _ = get_title(config, org, repo, number)
         if title:
             info_out('It worked!')
             success_out(title)

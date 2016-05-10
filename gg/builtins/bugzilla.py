@@ -90,8 +90,7 @@ def get_summary(config, bugnumber):
         'ids': bugnumber,
         'include_fields': 'summary'
     }
-    base_url = BUGZILLA_URL
-
+    base_url = config.bugzilla_url
     state = read(config.configfile)
 
     credentials = state.get('BUGZILLA')
@@ -107,7 +106,15 @@ def get_summary(config, bugnumber):
     assert url.startswith('https://'), url
     response = requests.get(url, params=params)
     if response.status_code == 200:
-        return response.json()['bugs'][0]['summary']
+        data = response.json()
+        bug = data['bugs'][0]
+
+        bug_url = urllib.parse.urljoin(
+            base_url,
+            '/show_bug.cgi?id={}'.format(bug['id'])
+        )
+        return bug['summary'], bug_url
+    return None, None
 
 
 @bugzilla.command()
@@ -127,10 +134,10 @@ def test(config, bugnumber):
         info_out('Using: {}'.format(credentials['bugzilla_url']))
 
     if bugnumber:
-        summary = get_summary(config, bugnumber)
+        summary, _ = get_summary(config, bugnumber)
         if summary:
-            success_out('It worked!')
-            info_out(summary)
+            info_out('It worked!')
+            success_out(summary)
         else:
             error_out('Unable to fetch')
     else:
