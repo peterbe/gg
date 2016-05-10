@@ -90,7 +90,9 @@ def get_summary(config, bugnumber):
         'ids': bugnumber,
         'include_fields': 'summary'
     }
-    base_url = config.bugzilla_url
+    # If this function is called from a plugin, we don't have
+    # config.bugzilla_url this time.
+    base_url = getattr(config, 'bugzilla_url', BUGZILLA_URL)
     state = read(config.configfile)
 
     credentials = state.get('BUGZILLA')
