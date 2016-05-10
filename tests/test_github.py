@@ -131,6 +131,7 @@ def test_test_issue_url(temp_configfile, mocker):
         return Response({
             'id': 123456,
             'title': 'Issue Title Here',
+            'html_url': 'https://api.github.com/repos/peterbe/gg/issues/123',
         })
 
     rget.side_effect = mocked_get
@@ -175,3 +176,29 @@ def test_burn(temp_configfile, mocker):
     with open(temp_configfile) as f:
         saved = json.load(f)
         assert 'GITHUB' not in saved
+
+
+def test_get_title(temp_configfile, mocker):
+    rget = mocker.patch('requests.get')
+
+    def mocked_get(url, headers):
+        assert url == 'https://api.github.com/repos/peterbe/gg/issues/1'
+        # assert 'token' not in params
+        return Response({
+            'html_url': 'https://github.com/peterbe/gg/issues/1',
+            'id': 85565047,
+            'number': 1,
+            'title': 'This is the title',
+        })
+
+    rget.side_effect = mocked_get
+
+    config = Config()
+    config.configfile = temp_configfile
+    # config.bugzilla_url = 'https://bugs.example.com'
+
+    title, url = github.get_title(
+        config, 'peterbe', 'gg', 1
+    )
+    assert title == 'This is the title'
+    assert url == 'https://github.com/peterbe/gg/issues/1'
