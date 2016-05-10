@@ -88,7 +88,7 @@ def logout(config):
 def get_summary(config, bugnumber):
     params = {
         'ids': bugnumber,
-        'include_fields': 'summary'
+        'include_fields': 'summary,id'
     }
     # If this function is called from a plugin, we don't have
     # config.bugzilla_url this time.
