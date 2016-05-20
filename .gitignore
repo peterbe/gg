@@ -4,3 +4,4 @@ build/
 .cache/
 .eggs/
 .tox/
+htmlcov/
