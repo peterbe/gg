@@ -3,6 +3,7 @@ language: python
 before_install:
 - travis_retry pip install twine
 - travis_retry pip install tox
+- travis_retry pip install codecov
 install:
 - travis_retry python setup.py install
 python: 3.5
@@ -12,6 +13,8 @@ env:
 - TOX_ENV=end2end
 script:
 - tox -e $TOX_ENV
+after_success:
+- bash <(curl -s https://codecov.io/bash)
 branches:
   only:
   - master
