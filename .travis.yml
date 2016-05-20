@@ -14,7 +14,7 @@ env:
 script:
 - tox -e $TOX_ENV
 after_success:
-- codecov
+- bash <(curl -s https://codecov.io/bash)
 branches:
   only:
   - master
