@@ -202,3 +202,31 @@ def test_get_title(temp_configfile, mocker):
     )
     assert title == 'This is the title'
     assert url == 'https://github.com/peterbe/gg/issues/1'
+
+
+def test_find_pull_requests(temp_configfile, mocker):
+    rget = mocker.patch('requests.get')
+    getpass = mocker.patch('getpass.getpass')
+    getpass.return_value = 'somelongapitokenhere'
+
+    with open(temp_configfile, 'w') as f:
+        saved = {
+            'GITHUB': {
+                'token': 'somelongapitokenhere',
+                'login': 'peterbe',
+                'github_url': 'https://enterprise.github.com',
+            }
+        }
+        json.dump(saved, f)
+
+    def mocked_get(url, params, headers):
+        assert url == 'https://api.github.com/repos/myorg/myrepo/pulls'
+        assert headers['Authorization'] == 'token somelongapitokenhere'
+        return Response([])
+
+    rget.side_effect = mocked_get
+    config = Config()
+    config.configfile = temp_configfile
+    config.github_url = 'https://example.com'
+    found = github.find_pull_requests(config, 'myorg', 'myrepo')
+    assert found == []
