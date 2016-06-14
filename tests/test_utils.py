@@ -1,5 +1,6 @@
 import tempfile
 
+import click
 import pytest
 import git
 
@@ -19,3 +20,18 @@ def test_get_repo_never_found(mocker):
 def test_get_repo_name():
     this_repo_name = utils.get_repo_name()
     assert this_repo_name == 'gg'
+
+
+def test_error_out(capsys):
+    with pytest.raises(click.Abort):
+        utils.error_out('Blarg')
+    out, err = capsys.readouterr()
+    assert not err
+    assert out == 'Blarg\n'
+
+
+def test_error_out_no_raise(capsys):
+    utils.error_out('Blarg', False)
+    out, err = capsys.readouterr()
+    assert not err
+    assert out == 'Blarg\n'

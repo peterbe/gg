@@ -17,9 +17,10 @@ def get_repo_name():
     return os.path.basename(repo.working_dir)
 
 
-def error_out(msg):
+def error_out(msg, raise_abort=True):
     click.echo(click.style(msg, fg='red'))
-    raise click.Abort
+    if raise_abort:
+        raise click.Abort
 
 
 def success_out(msg):
