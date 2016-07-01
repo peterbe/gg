@@ -1,4 +1,5 @@
 import os
+from urllib.parse import urlparse
 
 import click
 import git
@@ -29,3 +30,15 @@ def success_out(msg):
 
 def info_out(msg):
     click.echo(msg)
+
+
+def is_github(data):
+    if data.get('bugnumber') and data.get('url'):
+        return 'github' in urlparse(data['url']).netloc
+    return False
+
+
+def is_bugzilla(data):
+    if data.get('bugnumber') and data.get('url'):
+        return 'bugzilla' in urlparse(data['url']).netloc
+    return False

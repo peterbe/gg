@@ -35,3 +35,49 @@ def test_error_out_no_raise(capsys):
     out, err = capsys.readouterr()
     assert not err
     assert out == 'Blarg\n'
+
+
+def test_is_github():
+    good_data = {
+        'bugnumber': 123,
+        'url': 'https://github.com/peterbe/gg/issues/1',
+    }
+    assert utils.is_github(good_data)
+
+    not_good_data = {
+        'bugnumber': 123,
+        'url': 'https://issuetracker.example.com/1234',
+    }
+    assert not utils.is_github(not_good_data)
+
+    not_good_data = {
+        'bugnumber': None,
+        'url': 'https://github.com/peterbe/gg/issues/1',
+    }
+    assert not utils.is_github(not_good_data)
+
+
+def test_is_bugzilla():
+    good_data = {
+        'bugnumber': 123,
+        'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=12345678',
+    }
+    assert utils.is_bugzilla(good_data)
+
+    good_data = {
+        'bugnumber': 123,
+        'url': 'https://bugzilla.redhat.com/show_bug.cgi?id=12345',
+    }
+    assert utils.is_bugzilla(good_data)
+
+    not_good_data = {
+        'bugnumber': 123,
+        'url': 'https://issuetracker.example.com/1234',
+    }
+    assert not utils.is_bugzilla(not_good_data)
+
+    not_good_data = {
+        'bugnumber': None,
+        'url': 'https://bugzilla.mozilla.org/show_bug.cgi?id=12345678',
+    }
+    assert not utils.is_bugzilla(not_good_data)
