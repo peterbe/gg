@@ -1,6 +1,7 @@
 sudo: false
 language: python
 before_install:
+- travis_retry pip install -U pip
 - travis_retry pip install twine
 - travis_retry pip install tox
 - travis_retry pip install codecov
