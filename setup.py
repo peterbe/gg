@@ -6,7 +6,7 @@ _here = path.dirname(__file__)
 
 setup(
     name='gg',
-    version='0.0.16',
+    version='0.0.17',
     author='Peter Bengtsson',
     author_email='mail@peterbe.com',
     url='https://github.com/peterbe/gg',
