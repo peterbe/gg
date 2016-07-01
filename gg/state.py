@@ -25,10 +25,11 @@ def save(configfile, description, branch_name, **extra):
     update(configfile, new)
 
 
-# def load(configfile, branch_name):
-#     # like read() but returning specifically the state for the current repo
-#     key = '{}:{}'.format(get_repo_name(), branch_name)
-#     return read(configfile)[key]
+def load(configfile, branch_name):
+    # like read() but returning specifically the state for the current repo
+    key = '{}:{}'.format(get_repo_name(), branch_name)
+    return read(configfile)[key]
+
 
 def update(configfile, data):
     state = read(configfile)

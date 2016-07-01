@@ -28,3 +28,12 @@ def test_remove(temp_configfile):
         saved = json.load(f)
         assert 'any' not in saved
         assert saved['other'] == 'stuff'
+
+
+def test_load(temp_configfile):
+    state.write(temp_configfile, {})
+    state.save(temp_configfile, 'My description', 'branch-name', foo='bar')
+    saved = state.load(temp_configfile, 'branch-name')
+    assert saved['description'] == 'My description'
+    assert saved['foo'] == 'bar'
+    assert saved['date']
