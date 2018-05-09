@@ -5,3 +5,4 @@ build/
 .eggs/
 .tox/
 htmlcov/
+.pytest_cache/
