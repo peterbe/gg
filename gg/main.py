@@ -5,10 +5,11 @@ import click
 
 from . import state
 
-DEFAULT_CONFIGFILE = os.path.expanduser('~/.gg.json')
+DEFAULT_CONFIGFILE = os.path.expanduser("~/.gg.json")
 
 
 class Config(object):
+
     def __init__(self):
         self.verbose = False  # default
         self.configfile = DEFAULT_CONFIGFILE
@@ -18,14 +19,12 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
 
 
 @click.group()
+@click.option("-v", "--verbose", is_flag=True)
 @click.option(
-    '-v', '--verbose',
-    is_flag=True
-)
-@click.option(
-    '-c', '--configfile',
+    "-c",
+    "--configfile",
     default=DEFAULT_CONFIGFILE,
-    help='Path to the config file (default: {})'.format(DEFAULT_CONFIGFILE)
+    help="Path to the config file (default: {})".format(DEFAULT_CONFIGFILE),
 )
 @pass_config
 def cli(config, configfile, verbose):
@@ -38,12 +37,14 @@ def cli(config, configfile, verbose):
 
 
 # load in the builtin apps
-from .builtins import bugzilla  # NOQA
-from .builtins import github  # NOQA
-from .builtins import config as _  # NOQA
+from .builtins import bugzilla  # noqa
+from .builtins import github  # noqa
+from .builtins import config as _  # noqa
+from .builtins.commit import gg_commit  # noqa
+from .builtins.start import gg_start  # noqa
 
 # Simply loading all installed packages that have this entry_point
 # will be enough. Each plugin automatically registers itself with the
 # cli click group.
-for entry_point in iter_entry_points(group='gg.plugin', name=None):
+for entry_point in iter_entry_points(group="gg.plugin", name=None):
     entry_point.load()
