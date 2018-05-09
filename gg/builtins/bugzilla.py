@@ -30,35 +30,40 @@ def bugzilla(config, bugzilla_url):
 
 
 @bugzilla.command()
+@click.argument(
+    "api_key",
+    default='',
+    # help="Bla bla",
+)
 @pass_config
-def login(config):
-    """Go fetch a Bugzilla cookie"""
-    state = read(config.configfile)
-    default = getpass.getuser()
-    if state.get("BUGZILLA"):
-        if state["BUGZILLA"].get("login"):
-            default = state["BUGZILLA"]["login"]
-
-    login = input("Username/Email [{}]: ".format(default)).strip() or default
-    password = getpass.getpass("Password (Will never be stored!): ")
-    if not password:
-        error_out("No password :(")
-
-    url = urllib.parse.urljoin(config.bugzilla_url, "/rest/login")
-    assert url.startswith("https://"), url
-    response = requests.get(url, params={"login": login, "password": password})
-
-    if response.status_code == 200:
-        token = response.json()["token"]
-        update(
-            config.configfile,
-            {
-                "BUGZILLA": {
-                    "bugzilla_url": config.bugzilla_url, "login": login, "token": token
-                }
-            },
+def login(config, api_key=''):
+    """Store your Bugzilla API Key"""
+    if not api_key:
+        info_out(
+            "If you don't have an API Key, go to:\n"
+            "https://bugzilla.mozilla.org/userprefs.cgi?tab=apikey\n"
         )
-        success_out("Yay! It worked!")
+        api_key = getpass.getpass("API Key: ")
+
+    # Before we store it, let's test it.
+    url = urllib.parse.urljoin(config.bugzilla_url, "/rest/whoami")
+    assert url.startswith("https://"), url
+    response = requests.get(url, params={"api_key": api_key})
+    if response.status_code == 200:
+        if response.json().get('error'):
+            error_out("Failed - {}".format(response.json()))
+        else:
+            update(
+                config.configfile,
+                {
+                    "BUGZILLA": {
+                        "bugzilla_url": config.bugzilla_url,
+                        "api_key": api_key,
+                        # "login": login,
+                    }
+                },
+            )
+            success_out("Yay! It worked!")
     else:
         error_out("Failed - {} ({})".format(response.status_code, response.json()))
 
@@ -86,11 +91,12 @@ def get_summary(config, bugnumber):
     if credentials:
         # cool! let's use that
         base_url = credentials["bugzilla_url"]
-        params["token"] = credentials["token"]
+        params["api_key"] = credentials["api_key"]
 
     url = urllib.parse.urljoin(base_url, "/rest/bug/")
     assert url.startswith("https://"), url
     response = requests.get(url, params=params)
+    response.raise_for_status()
     if response.status_code == 200:
         data = response.json()
         bug = data["bugs"][0]
@@ -108,11 +114,11 @@ def get_summary(config, bugnumber):
 )
 @pass_config
 def test(config, bugnumber):
-    """Test your saved Bugzilla credentials."""
+    """Test your saved Bugzilla API Key."""
     state = read(config.configfile)
     credentials = state.get("BUGZILLA")
     if not credentials:
-        error_out("No credentials saved. Run: gg bugzilla login")
+        error_out("No API Key saved. Run: gg bugzilla login")
     if config.verbose:
         info_out("Using: {}".format(credentials["bugzilla_url"]))
 
@@ -126,9 +132,13 @@ def test(config, bugnumber):
     else:
         url = urllib.parse.urljoin(credentials["bugzilla_url"], "/rest/whoami")
         assert url.startswith("https://"), url
-        response = requests.get(url, params={"token": credentials["token"]})
+
+        response = requests.get(url, params={"api_key": credentials["api_key"]})
         if response.status_code == 200:
-            success_out(json.dumps(response.json(), indent=2))
+            if response.json().get('error'):
+                error_out("Failed! - {}".format(response.json()))
+            else:
+                success_out(json.dumps(response.json(), indent=2))
         else:
             error_out(
                 "Failed to query - {} ({})".format(
