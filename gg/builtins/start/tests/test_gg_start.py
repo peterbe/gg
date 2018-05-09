@@ -5,6 +5,7 @@ import shutil
 
 import git
 import pytest
+import requests_mock
 from click.testing import CliRunner
 
 # By doing this import we make sure that the plugin is made available
@@ -15,6 +16,22 @@ from gg.main import Config
 from gg.testing import Response
 
 from gg.builtins.start.gg_start import start, parse_remote_url
+
+
+@pytest.fixture(autouse=True)
+def requestsmock():
+    """Return a context where requests are all mocked.
+    Usage::
+
+        def test_something(requestsmock):
+            requestsmock.get(
+                'https://example.com/path'
+                content=b'The content'
+            )
+            # Do stuff that involves requests.get('http://example.com/path')
+    """
+    with requests_mock.mock() as m:
+        yield m
 
 
 @pytest.yield_fixture
@@ -155,7 +172,19 @@ def test_start_a_digit(temp_configfile, mocker):
     assert result.exit_code == 1
 
 
-def test_start_github_issue(temp_configfile, mocker):
+def test_start_github_issue(temp_configfile, mocker, requestsmock):
+
+    requestsmock.get(
+        "https://api.github.com/repos/peterbe/gg-start/issues/7",
+        content=json.dumps(
+            {
+                "title": "prefix branch name differently for github issues",
+                "html_url": "https://github.com/peterbe/gg-start/issues/7",
+            }
+        ).encode(
+            "utf-8"
+        ),
+    )
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"
 
@@ -168,6 +197,8 @@ def test_start_github_issue(temp_configfile, mocker):
         input='foo "bar"\n',
         obj=config,
     )
+    if result.exception:
+        raise result.exception
     assert result.exit_code == 0
     assert not result.exception
 
@@ -183,7 +214,25 @@ def test_start_github_issue(temp_configfile, mocker):
         assert saved[key]["date"]
 
 
-def test_start_bugzilla_url(temp_configfile, mocker):
+def test_start_bugzilla_url(temp_configfile, mocker, requestsmock):
+    requestsmock.get(
+        "https://bugzilla.mozilla.org/rest/bug/?ids=123456&include_fields=summary%2Cid",
+        content=json.dumps(
+            {
+                "bugs": [
+                    {
+                        "assigned_to": "nobody@mozilla.org",
+                        "id": 1234,
+                        "status": "NEW",
+                        "summary": "This is the summary",
+                    }
+                ],
+                "faults": [],
+            }
+        ).encode(
+            "utf-8"
+        ),
+    )
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"
 
@@ -196,6 +245,8 @@ def test_start_bugzilla_url(temp_configfile, mocker):
         input='foo "bar"\n',
         obj=config,
     )
+    if result.exception:
+        raise result.exception
     assert result.exit_code == 0
     assert not result.exception
 

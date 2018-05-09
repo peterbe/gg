@@ -35,6 +35,6 @@ setup(
         gg=gg.main:cli
     """,
     setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-mock'],
+    tests_require=['pytest', 'pytest-mock', 'requests_mock'],
     keywords="git click github bugzilla",
 )

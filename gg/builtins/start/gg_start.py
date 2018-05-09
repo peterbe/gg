@@ -20,6 +20,7 @@ def start(config, bugnumber=""):
     try:
         repo = get_repo()
     except git.InvalidGitRepositoryError as exception:
+        print("OH NO!")
         error_out('"{}" is not a git repository'.format(exception.args[0]))
 
     if bugnumber:
@@ -33,6 +34,7 @@ def start(config, bugnumber=""):
     else:
         summary = input("Summary: ").strip()
 
+    print("RIGHT HERE!", bugnumber)
     branch_name = ""
     if bugnumber:
         if is_github({"bugnumber": bugnumber, "url": url}):
