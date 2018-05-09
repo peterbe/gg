@@ -1,0 +1,10 @@
+# These are only for testing.
+# If the main project needs dependencies, set that in setup.py
+tox
+pytest
+pytest-mock
+pytest-cov
+pytest-sugar
+black
+flake8
+requests_mock
