@@ -69,6 +69,20 @@ Now you can type::
 If you have install more plugins they will be listed under the same
 ``--help`` command.
 
+Linting
+=======
+
+This project tracks `black <https://pypi.org/project/black/>`_ and expects
+all files to be as per how ``black`` wants them. Please see its repo for how to
+set up automatic formatting.
+
+All code needs to be ``flake8`` conformant. See ``setup.cfg`` for the rules.
+
+To test both, run::
+
+    tox -e lint
+
+
 Version History
 ===============
 
