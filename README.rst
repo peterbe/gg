@@ -83,6 +83,25 @@ To test both, run::
     tox -e lint
 
 
+How to write a plugin
+=====================
+
+To write your own custom plugin, (similar to ``gg/builtins/commands/commit``)
+these are the critical lines you need to you have in your ``setup.py``::
+
+    setup(
+        ...
+        install_requires=['gg'],
+        entry_points="""
+            [gg.plugin]
+            cli=gg_myplugin:start
+        """,
+        ...
+    )
+
+This assumes you have a file called ``gg_myplugin.py`` that has a function
+called ``start``.
+
 Version History
 ===============
 

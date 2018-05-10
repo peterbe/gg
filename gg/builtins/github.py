@@ -32,15 +32,14 @@ def github(config, github_url):
 def token(config, token):
     """Store and fetch a GitHub access token"""
     if not token:
-        if config.verbose:
-            info_out(
-                "To generate a personal API token, go to:\n\n\t"
-                "https://github.com/settings/tokens\n\n"
-                "To read more about it, go to:\n\n\t"
-                "https://help.github.com/articles/creating-an-access"
-                "-token-for-command-line-use/\n\n"
-                'Remember to enable "repo" in the scopes.'
-            )
+        info_out(
+            "To generate a personal API token, go to:\n\n\t"
+            "https://github.com/settings/tokens\n\n"
+            "To read more about it, go to:\n\n\t"
+            "https://help.github.com/articles/creating-an-access"
+            "-token-for-command-line-use/\n\n"
+            'Remember to enable "repo" in the scopes.'
+        )
         token = getpass.getpass("GitHub API Token: ").strip()
     url = urllib.parse.urljoin(config.github_url, "/user")
     assert url.startswith("https://"), url
