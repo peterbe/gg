@@ -13,7 +13,6 @@ from click.testing import CliRunner
 # An alternative would we to set `PYTHONPATH=. py.test` (or something)
 # but then that wouldn't test the entry point loading.
 from gg.main import Config
-from gg.testing import Response
 
 from gg.builtins.start.gg_start import start, parse_remote_url
 
@@ -105,7 +104,7 @@ def test_start_not_a_git_repo(temp_configfile, mocker):
     assert result.exception
 
 
-def test_start_a_digit(temp_configfile, mocker):
+def test_start_a_digit(temp_configfile, mocker, requestsmock):
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"
 
@@ -121,46 +120,48 @@ def test_start_a_digit(temp_configfile, mocker):
     remotes.append(Remote("other", "https://github.com/o/ther.git"))
     mocked_git().remotes.__iter__.return_value = remotes
 
-    rget = mocker.patch("requests.get")
-
-    def mocked_get(url, *args, **kwargs):
-        if url == "https://bugzilla.mozilla.org/rest/bug/":
-            params = kwargs["params"]
-            assert params["ids"] == "1234"
-            return Response(
-                {
-                    "bugs": [
-                        {
-                            "assigned_to": "nobody@mozilla.org",
-                            "assigned_to_detail": {
-                                "email": "nobody@mozilla.org",
-                                "id": 1,
-                                "name": "nobody@mozilla.org",
-                                "real_name": "Nobody; OK to take it and work on it",
-                            },
-                            "id": 1234,
-                            "status": "NEW",
-                            "summary": "This is the summary",
-                        }
-                    ],
-                    "faults": [],
-                }
-            )
-        if url == "https://api.github.com/repos/myorg/myrepo/issues/1234":
-            return Response(
-                {
-                    "id": 1234,
-                    "title": "Issue Title Here",
-                    "html_url": (
-                        "https://api.github.com/repos/myorg/myrepo/issues/123"
-                    ),
-                }
-            )
-        if url == "https://api.github.com/repos/o/ther/issues/1234":
-            return Response({"not": "found"}, 404)
-        raise NotImplementedError(url)
-
-    rget.side_effect = mocked_get
+    # rget = mocker.patch("requests.get")
+    requestsmock.get(
+        "https://bugzilla.mozilla.org/rest/bug/",
+        content=json.dumps(
+            {
+                "bugs": [
+                    {
+                        "assigned_to": "nobody@mozilla.org",
+                        "assigned_to_detail": {
+                            "email": "nobody@mozilla.org",
+                            "id": 1,
+                            "name": "nobody@mozilla.org",
+                            "real_name": "Nobody; OK to take it and work on it",
+                        },
+                        "id": 1234,
+                        "status": "NEW",
+                        "summary": "This is the summary",
+                    }
+                ],
+                "faults": [],
+            }
+        ).encode(
+            "utf-8"
+        ),
+    )
+    requestsmock.get(
+        "https://api.github.com/repos/myorg/myrepo/issues/1234",
+        content=json.dumps(
+            {
+                "id": 1234,
+                "title": "Issue Title Here",
+                "html_url": ("https://api.github.com/repos/myorg/myrepo/issues/123"),
+            }
+        ).encode(
+            "utf-8"
+        ),
+    )
+    requestsmock.get(
+        "https://api.github.com/repos/o/ther/issues/1234",
+        status_code=404,
+        content=json.dumps({"not": "found"}).encode("utf-8"),
+    )
 
     runner = CliRunner()
     config = Config()

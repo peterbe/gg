@@ -30,13 +30,9 @@ def bugzilla(config, bugzilla_url):
 
 
 @bugzilla.command()
-@click.argument(
-    "api_key",
-    default='',
-    # help="Bla bla",
-)
+@click.argument("api_key", default="")
 @pass_config
-def login(config, api_key=''):
+def login(config, api_key=""):
     """Store your Bugzilla API Key"""
     if not api_key:
         info_out(
@@ -50,7 +46,7 @@ def login(config, api_key=''):
     assert url.startswith("https://"), url
     response = requests.get(url, params={"api_key": api_key})
     if response.status_code == 200:
-        if response.json().get('error'):
+        if response.json().get("error"):
             error_out("Failed - {}".format(response.json()))
         else:
             update(
@@ -135,7 +131,7 @@ def test(config, bugnumber):
 
         response = requests.get(url, params={"api_key": credentials["api_key"]})
         if response.status_code == 200:
-            if response.json().get('error'):
+            if response.json().get("error"):
                 error_out("Failed! - {}".format(response.json()))
             else:
                 success_out(json.dumps(response.json(), indent=2))
