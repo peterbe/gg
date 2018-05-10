@@ -1,9 +1,10 @@
-========
-gg-start
-========
+=======
+gg-push
+=======
 
 A plugin for `gg <https://github.com/peterbe/gg>`_ for starting new
-branches.
+pushing branches to remotes.
+
 
 Version History
 ===============

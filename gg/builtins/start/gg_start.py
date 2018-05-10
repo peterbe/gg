@@ -34,7 +34,6 @@ def start(config, bugnumber=""):
     else:
         summary = input("Summary: ").strip()
 
-    print("RIGHT HERE!", bugnumber)
     branch_name = ""
     if bugnumber:
         if is_github({"bugnumber": bugnumber, "url": url}):
