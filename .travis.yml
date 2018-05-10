@@ -1,29 +1,10 @@
 sudo: false
 language: python
-before_install:
-- travis_retry pip install -U pip
-- travis_retry pip install twine
-- travis_retry pip install tox
-- travis_retry pip install codecov
-install:
-- travis_retry python setup.py install
-python: 3.5
-env:
-- TOX_ENV=flake8
-- TOX_ENV=py35
-- TOX_ENV=end2end
-script:
-- tox -e $TOX_ENV
-after_success:
-- bash <(curl -s https://codecov.io/bash)
+python:
+  - "3.5"
+  - "3.6"
 branches:
   only:
   - master
-deploy:
-  provider: pypi
-  user: peterbe
-  password:
-    secure: qz6Q5Ejdrxm4JelrsK1Q9F7TBF6Wm7dl9bYt0/1si0pNfHESrMgQ/vA+RgWbNqgs8IHpndu2UCFNRjI4lulvYmDVCYioctolVP5kM9gOgnIQ5cLc2n45VUeyjOsfQez/slgNjiC1DM60jjFeYVVYZ34drE3bxW/9vUIeiFCQLMd+iVLIWONGTNT7cZI2/7r0ZJ/Kj7InL75JNduFqt3lj7pP3L1KjjrEW4PgoatjNVeo1geV/sFlnUSDKvfLJlUuD7b8fRfdqBDX/m1NIVKvt+JSuugt1PSeKW20daEkQrAo+h+3tVb85T/5Hc9a1oLaXU+I/fmTvWHVSlwhvTYtY3w35mr/r0R2a/jOqAxxSG18BUHcBNfuZaOq5Ch8DjDZVYxeiJ8uWO0VuQ4kX/veJ/Zv18GVzyZj499OcfMatqWNY3cZ7sJb44kvYQk7QQt5MV5rQP09iLwQE5WawtoIQRkqhvEEF9JqyM/gm7b1+ppYiQxsLEAkBKt4wcYxQErRkNe3jm3BcqlyNKwWj1J2DbaC76M6B91C1pX/3Lhe4M1D32yhs3E8WDJXVeySSKayvUJuV3uLPCHjFeDzRyPm29aBNsrvZtCH7XhfPya1RZiPWeD9+LY24WMtgIECDM2+SkgEhM5dkqqPgMb9kMHmGaT1hCqx8YuOpia3nDudhG8=
-  distributions: sdist bdist_wheel
-  on:
-    repo: peterbe/gg
+install: pip install tox-travis
+script: tox
