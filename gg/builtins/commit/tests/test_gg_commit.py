@@ -26,6 +26,13 @@ def temp_configfile():
     shutil.rmtree(tmp_dir)
 
 
+class MockDiff:
+
+    def __init__(self, path, deleted_file=False):
+        self.b_path = path
+        self.deleted_file = deleted_file
+
+
 def test_commit(temp_configfile, mocker):
     rget = mocker.patch("requests.get")
 
@@ -39,7 +46,7 @@ def test_commit(temp_configfile, mocker):
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-commit-test"
     mocked_git().active_branch.name = "my-topic-branch"
-    mocked_git().index.entries.keys.return_value = [("foo.txt", 0)]
+    mocked_git().index.diff.return_value = [MockDiff("some/path.txt")]
 
     my_remote = mocker.MagicMock()
     origin_remote = mocker.MagicMock()
@@ -64,7 +71,8 @@ def test_commit(temp_configfile, mocker):
     config = Config()
     config.configfile = temp_configfile
     result = runner.invoke(commit, [], input="\n\n", obj=config)
-
+    if result.exception:
+        raise result.exception
     assert result.exit_code == 0
     assert not result.exception
     pr_url = (
@@ -78,7 +86,7 @@ def test_commit_without_github(temp_configfile, mocker):
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-commit-test"
     mocked_git().active_branch.name = "my-topic-branch"
-    mocked_git().index.entries.keys.return_value = [("foo.txt", 0)]
+    mocked_git().index.diff.return_value = [MockDiff("foo.txt")]
 
     # first we have to fake some previous information
     state = json.load(open(temp_configfile))
@@ -101,31 +109,12 @@ def test_commit_without_github(temp_configfile, mocker):
     config = Config()
     config.configfile = temp_configfile
     result = runner.invoke(commit, [], input="\n\n", obj=config)
+    if result.exception:
+        # print(result.exception)
+        # print(result.output)
+        raise result.exception
     assert result.exit_code == 0
     assert not result.exception
-
-
-def test_commit_no_fork_name(temp_configfile, mocker):
-    mocked_git = mocker.patch("git.Repo")
-    mocked_git().working_dir = "gg-commit-test"
-    mocked_git().active_branch.name = "my-topic-branch"
-    mocked_git().index.entries.keys.return_value = [("foo.txt", 0)]
-
-    # first we have to fake some previous information
-    state = json.load(open(temp_configfile))
-    state["gg-commit-test:my-topic-branch"] = {
-        "description": "Some description", "bugnumber": None
-    }
-    with open(temp_configfile, "w") as f:
-        json.dump(state, f)
-
-    runner = CliRunner()
-    config = Config()
-    config.configfile = temp_configfile
-    result = runner.invoke(commit, [], input="\n", obj=config)
-    assert result.exit_code == 0
-    assert not result.exception
-    assert "Can't help you push the commit" in result.output
 
 
 def test_commit_no_files_to_add(temp_configfile, mocker):
@@ -168,8 +157,10 @@ def test_commit_without_start(temp_configfile, mocker):
 def test_humanize_seconds():
     assert humanize_seconds(1) == "1 second"
     assert humanize_seconds(45) == "45 seconds"
-    assert humanize_seconds(45 + 60) == "1 minute 45 seconds"
-    assert humanize_seconds(45 + 60 * 2) == "2 minutes 45 seconds"
+    # assert humanize_seconds(45 + 60) == "1 minute 45 seconds"
+    assert humanize_seconds(45 + 60) == "1 minute"
+    # assert humanize_seconds(45 + 60 * 2) == "2 minutes 45 seconds"
+    assert humanize_seconds(45 + 60 * 2) == "2 minutes"
     assert humanize_seconds(60 * 60) == "1 hour"
     assert humanize_seconds(60 * 60 * 2) == "2 hours"
     assert humanize_seconds(60 * 60 * 24) == "1 day"

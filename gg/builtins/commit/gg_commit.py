@@ -19,6 +19,7 @@ from gg.builtins import github
     "-n",
     "--no-verify",
     default=False,
+    is_flag=True,
     help="This option bypasses the pre-commit and commit-msg hooks.",
 )
 @pass_config
@@ -35,18 +36,42 @@ def commit(config, no_verify):
             "Can't commit when on the master branch. "
             "You really ought to do work in branches."
         )
-    untracked_files = {}
+
     now = time.time()
 
+    def count_files_in_directory(directory):
+        count = 0
+        for root, _, files in os.walk(directory):
+            # We COULD crosscheck these files against the .gitignore
+            # if we ever felt overachievious.
+            count += len(files)
+        return count
+
+    # First group all untracked files by root folder
+    all_untracked_files = {}
     for path in repo.untracked_files:
-        age = now - os.stat(path).st_mtime
         root = path.split(os.path.sep)[0]
-        if root in untracked_files:
-            if age < untracked_files[root]:
-                # youngest file in that directory
-                untracked_files[root] = age
-        else:
-            untracked_files[root] = age
+        if root not in all_untracked_files:
+            all_untracked_files[root] = {
+                "files": [], "total_count": count_files_in_directory(root)
+            }
+        all_untracked_files[root]["files"].append(path)
+
+    # Now filter this based on it being single files or a bunch
+    untracked_files = {}
+    for root, info in all_untracked_files.items():
+        for path in info["files"]:
+            age = now - os.stat(path).st_mtime
+            # If there's fewer untracked files in its directory, suggest
+            # the directory instead.
+            if info["total_count"] == 1:
+                path = root
+            if path in untracked_files:
+                if age < untracked_files[path]:
+                    # youngest file in that directory
+                    untracked_files[path] = age
+            else:
+                untracked_files[path] = age
 
     if untracked_files:
         ordered = sorted(untracked_files.items(), key=lambda x: x[1], reverse=True)
@@ -54,7 +79,7 @@ def commit(config, no_verify):
         for path, age in ordered:
             if os.path.isdir(path):
                 path = path + "/"
-            print("\t", path.ljust(60), humanize_seconds(age))
+            print("\t", path.ljust(60), humanize_seconds(age), "old")
 
         # But only put up this input question if one the files is
         # younger than 12 hours.
@@ -106,16 +131,21 @@ def commit(config, no_verify):
 
     # Now we're going to do the equivalent of `git commit -a -m "..."`
     index = repo.index
-    # add every file
-    # XXX Maybe a faster approach is to loop over all staged and modified
-    # files (modified: `repo.index.diff(None)`,
-    # staged: `repo.index.diff('HEAD')`) and fish out the paths from that.
-    files = [path for path, stage in repo.index.entries.keys()]
-    if not files:
-        error_out("No files to add")
+    files_added = []
+    files_removed = []
+    for x in repo.index.diff(None):
+        if x.deleted_file:
+            files_removed.append(x.b_path)
+        else:
+            files_added.append(x.b_path)
+    if not (files_added or files_removed):
+        error_out("No files to add or remove")
     if not repo.is_dirty():
         error_out("Branch is not dirty. There is nothing to commit.")
-    index.add(files)
+    if files_added:
+        index.add(files_added)
+    if files_removed:
+        index.remove(files_removed)
     try:
         commit = index.commit(msg)
     except git.exc.HookExecutionError as exception:
@@ -233,5 +263,4 @@ def _humanize_time(amount, units):
 
 
 def humanize_seconds(seconds):
-    parts = ["{} {}".format(x, y) for x, y in _humanize_time(seconds, "seconds")]
-    return " ".join(parts)
+    return "{} {}".format(*_humanize_time(seconds, "seconds")[0])
