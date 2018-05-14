@@ -43,6 +43,7 @@ from .builtins import config as _  # noqa
 from .builtins.commit import gg_commit  # noqa
 from .builtins.start import gg_start  # noqa
 from .builtins.push import gg_push  # noqa
+from .builtins.getback import gg_getback  # noqa
 
 # Simply loading all installed packages that have this entry_point
 # will be enough. Each plugin automatically registers itself with the
