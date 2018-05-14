@@ -107,8 +107,6 @@ def commit(config, no_verify):
     # Now we're going to do the equivalent of `git commit -a -m "..."`
     index = repo.index
     # add every file
-    # XXX Maybe a faster approach is to loop over all staged and modified
-    # files (modified: `repo.index.diff(None)`,
     # staged: `repo.index.diff('HEAD')`) and fish out the paths from that.
     files = [path for path, stage in repo.index.entries.keys()]
     if not files:
