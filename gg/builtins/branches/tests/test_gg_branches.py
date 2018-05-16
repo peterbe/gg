@@ -80,4 +80,6 @@ def test_branches(temp_configfile, mocker):
     assert result.exit_code == 0
     assert not result.exception
 
-    branch2.checkout.assert_called_once()
+    # .assert_called_once() is new only in 3.6
+    # branch2.checkout.assert_called_once()
+    branch2.checkout.assert_called_with()
