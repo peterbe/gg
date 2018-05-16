@@ -45,12 +45,20 @@ def temp_configfile():
 def test_branches(temp_configfile, mocker):
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"
-    active_branch = mocker.MagicMock()
-    mocked_git().active_branch = active_branch
-    mocked_remote = mocker.MagicMock()
-    mocked_remote.name = "origin"
-    mocked_git().remotes.__iter__.return_value = [mocked_remote]
-    mocked_git().is_dirty.return_value = False
+    mocked_git().git.branch.return_value = """
+    * this-branch
+    other-branch
+    """
+    branch1 = mocker.MagicMock()
+    branch1.name = "this-branch"
+
+    branch2 = mocker.MagicMock()
+    branch2.name = "other-branch"
+    print(repr(branch2))
+
+    branch3 = mocker.MagicMock()
+    branch3.name = "not-merged-branch"
+    mocked_git().heads.__iter__.return_value = [branch1, branch2, branch3]
 
     state = json.load(open(temp_configfile))
     state["FORK_NAME"] = "peterbe"
@@ -60,13 +68,16 @@ def test_branches(temp_configfile, mocker):
     runner = CliRunner()
     config = Config()
     config.configfile = temp_configfile
-    result = runner.invoke(branches, [], input="\n", obj=config)
+    result = runner.invoke(branches, ["other"], input="\n", obj=config)
     if result.exception:
         # print(mocked_git.mock_calls)
         # print(result.output)
         # print(result.exception)
         raise result.exception
+    # print(result.output)
+    assert "other-branch" in result.output
+    assert "this-branch" not in result.output
     assert result.exit_code == 0
     assert not result.exception
 
-    mocked_git().git.branch.assert_called_with("-D", active_branch.name)
+    branch2.checkout.assert_called_once()

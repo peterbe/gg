@@ -5,7 +5,6 @@ import click
 
 from gg.utils import error_out, get_repo, info_out, success_out
 
-# from gg.state import read
 from gg.main import cli, pass_config
 
 
@@ -37,7 +36,6 @@ def branches(config, searchstring=""):
             ).lower().strip() != "n"
             if check_it_out:
                 branches_[0].checkout()
-                # raise Exception('CHECK OUT ' +branch_name)
     elif searchstring:
         error_out("Found no branches matching '{}'.".format(searchstring))
     else:
@@ -46,12 +44,9 @@ def branches(config, searchstring=""):
 
 def find(repo, searchstring):
     for head in repo.heads:
-        # if head.name == 'master':
-        #     continue
         if searchstring:
             if searchstring.lower() not in head.name.lower():
                 continue
-        # print(type(head))
         yield head
 
 
@@ -60,9 +55,6 @@ def get_merged_branches(repo):
     # merged. Then I wouldn't have to do this string splitting crap.
     output = repo.git.branch("--merged")
     return [x.split()[-1] for x in output.splitlines() if x.strip()]
-
-
-# def branch_info(head):
 
 
 def print_list(heads, merged_names):
