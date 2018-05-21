@@ -61,19 +61,26 @@ def print_list(heads, merged_names):
 
     def wrap(head):
         try:
-            most_recent = head.log()[-1]
+            log = head.log()
+        except ValueError as exception:
+            # https://github.com/gitpython-developers/GitPython/issues/758
             return {
                 "head": head,
-                "info": {
-                    "date": datetime.datetime.utcfromtimestamp(most_recent.time[0]),
-                    "message": most_recent.message,
-                    "oldhexsha": most_recent.oldhexsha,
-                },
+                "info": {"date": datetime.datetime.utcnow()},
+                "error": str(exception),
             }
+        try:
+            most_recent = log[-1]
         except IndexError:
             return {"head": head, "info": {"date": datetime.datetime.utcnow()}}
-            info = {"date": None, "message": None, "oldhexsha": None}
-        return info
+        return {
+            "head": head,
+            "info": {
+                "date": datetime.datetime.utcfromtimestamp(most_recent.time[0]),
+                "message": most_recent.message,
+                "oldhexsha": most_recent.oldhexsha,
+            },
+        }
 
     def format_age(dt):
         delta = datetime.datetime.utcnow() - dt
@@ -93,6 +100,8 @@ def print_list(heads, merged_names):
             each["head"].name
             + (each["head"].name in merged_names and " (MERGED ALREADY)" or "")
         )
+        if each.get("error"):
+            info_out("\tError getting ref log ({!r})".format(each["error"]))
         info_out("\t" + each["info"]["date"].isoformat())
         info_out("\t" + format_age(each["info"]["date"]))
         info_out("\t" + format_msg(each["info"].get("message", "*no commit yet*")))

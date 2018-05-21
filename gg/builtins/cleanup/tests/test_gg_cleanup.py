@@ -13,7 +13,7 @@ from click.testing import CliRunner
 # but then that wouldn't test the entry point loading.
 from gg.main import Config
 
-from gg.builtins.branches.gg_branches import branches
+from gg.builtins.cleanup.gg_cleanup import cleanup
 
 
 @pytest.fixture(autouse=True)
@@ -42,12 +42,12 @@ def temp_configfile():
     shutil.rmtree(tmp_dir)
 
 
-def test_branches(temp_configfile, mocker):
+def test_cleanup(temp_configfile, mocker):
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"
     mocked_git().git.branch.return_value = """
-    * this-branch
-    other-branch
+    this-branch
+    * other-branch
     """
     branch1 = mocker.MagicMock()
     branch1.name = "this-branch"
@@ -59,6 +59,9 @@ def test_branches(temp_configfile, mocker):
     branch3.name = "not-merged-branch"
     mocked_git().heads.__iter__.return_value = [branch1, branch2, branch3]
 
+    active_branch = mocker.MagicMock()
+    mocked_git().active_branch = active_branch
+
     state = json.load(open(temp_configfile))
     state["FORK_NAME"] = "peterbe"
     with open(temp_configfile, "w") as f:
@@ -67,18 +70,13 @@ def test_branches(temp_configfile, mocker):
     runner = CliRunner()
     config = Config()
     config.configfile = temp_configfile
-    result = runner.invoke(branches, ["other"], input="\n", obj=config)
+    result = runner.invoke(cleanup, ["other"], input="\n", obj=config)
     if result.exception:
         # print(mocked_git.mock_calls)
         # print(result.output)
         # print(result.exception)
         raise result.exception
-    # print(result.output)
-    assert "other-branch" in result.output
-    assert "this-branch" not in result.output
     assert result.exit_code == 0
     assert not result.exception
 
-    # .assert_called_once() is new only in 3.6
-    # branch2.checkout.assert_called_once()
-    branch2.checkout.assert_called_with()
+    mocked_git().git.branch.assert_called_with("-D", branch2.name)
