@@ -31,9 +31,10 @@ def branches(config, searchstring=""):
             branch_name = branches_[0].name
             if len(branch_name) > 50:
                 branch_name = branch_name[:47] + "…"
-            check_it_out = input(
-                "Check out '{}'? [Y/n] ".format(branch_name)
-            ).lower().strip() != "n"
+            check_it_out = (
+                input("Check out '{}'? [Y/n] ".format(branch_name)).lower().strip()
+                != "n"
+            )
             if check_it_out:
                 branches_[0].checkout()
     elif searchstring:

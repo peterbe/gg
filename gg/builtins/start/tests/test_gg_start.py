@@ -141,9 +141,7 @@ def test_start_a_digit(temp_configfile, mocker, requestsmock):
                 ],
                 "faults": [],
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
     requestsmock.get(
         "https://api.github.com/repos/myorg/myrepo/issues/1234",
@@ -153,9 +151,7 @@ def test_start_a_digit(temp_configfile, mocker, requestsmock):
                 "title": "Issue Title Here",
                 "html_url": ("https://api.github.com/repos/myorg/myrepo/issues/123"),
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
     requestsmock.get(
         "https://api.github.com/repos/o/ther/issues/1234",
@@ -182,9 +178,7 @@ def test_start_github_issue(temp_configfile, mocker, requestsmock):
                 "title": "prefix branch name differently for github issues",
                 "html_url": "https://github.com/peterbe/gg-start/issues/7",
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"
@@ -230,9 +224,7 @@ def test_start_bugzilla_url(temp_configfile, mocker, requestsmock):
                 ],
                 "faults": [],
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
     mocked_git = mocker.patch("git.Repo")
     mocked_git().working_dir = "gg-start-test"

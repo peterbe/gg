@@ -58,11 +58,13 @@ def test_commit(temp_configfile, mocker):
     # first we have to fake some previous information
     state = json.load(open(temp_configfile))
     state["gg-commit-test:my-topic-branch"] = {
-        "description": "Some description", "bugnumber": None
+        "description": "Some description",
+        "bugnumber": None,
     }
     state["FORK_NAME"] = "myusername"
     state["GITHUB"] = {
-        "token": "somelongapitokenhere", "github_url": "https://example.com"
+        "token": "somelongapitokenhere",
+        "github_url": "https://example.com",
     }
     with open(temp_configfile, "w") as f:
         json.dump(state, f)
@@ -91,7 +93,8 @@ def test_commit_without_github(temp_configfile, mocker):
     # first we have to fake some previous information
     state = json.load(open(temp_configfile))
     state["gg-commit-test:my-topic-branch"] = {
-        "description": "Some description", "bugnumber": None
+        "description": "Some description",
+        "bugnumber": None,
     }
     state["FORK_NAME"] = "myusername"
     with open(temp_configfile, "w") as f:
@@ -127,7 +130,8 @@ def test_commit_no_files_to_add(temp_configfile, mocker):
     # print(repr(temp_configfile))
     state = json.load(open(temp_configfile))
     state["gg-commit-test:my-topic-branch"] = {
-        "description": "Some description", "bugnumber": None
+        "description": "Some description",
+        "bugnumber": None,
     }
     with open(temp_configfile, "w") as f:
         json.dump(state, f)

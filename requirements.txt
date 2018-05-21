@@ -5,6 +5,6 @@ pytest
 pytest-mock
 pytest-cov
 pytest-sugar
-black
+black==black-18.5b0
 flake8
 requests_mock

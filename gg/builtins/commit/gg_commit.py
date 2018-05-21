@@ -53,7 +53,8 @@ def commit(config, no_verify):
         root = path.split(os.path.sep)[0]
         if root not in all_untracked_files:
             all_untracked_files[root] = {
-                "files": [], "total_count": count_files_in_directory(root)
+                "files": [],
+                "total_count": count_files_in_directory(root),
             }
         all_untracked_files[root]["files"].append(path)
 
@@ -176,9 +177,9 @@ def commit(config, no_verify):
     except IndexError:
         error_out("There is no remote called '{}'".format(state["FORK_NAME"]))
 
-    push_for_you = input(
-        "Push branch to {}? [Y/n] ".format(state["FORK_NAME"])
-    ).lower().strip()
+    push_for_you = (
+        input("Push branch to {}? [Y/n] ".format(state["FORK_NAME"])).lower().strip()
+    )
     if push_for_you not in ("n", "no"):
         destination = repo.remotes[state["FORK_NAME"]]
         pushed, = destination.push()
@@ -216,7 +217,8 @@ def commit(config, no_verify):
     # Search for an existing open pull request, and remind us of the link
     # to it.
     search = {
-        "head": "{}:{}".format(state["FORK_NAME"], active_branch.name), "state": "open"
+        "head": "{}:{}".format(state["FORK_NAME"], active_branch.name),
+        "state": "open",
     }
     for pull_request in github.find_pull_requests(config, org, repo, **search):
         print("Pull Request already created:")
