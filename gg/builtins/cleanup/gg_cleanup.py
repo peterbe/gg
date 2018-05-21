@@ -1,7 +1,6 @@
 import click
-import git
 
-from gg.utils import error_out, get_repo, info_out
+from gg.utils import error_out, info_out
 from gg.state import read
 from gg.main import cli, pass_config
 from gg.builtins.branches.gg_branches import find
@@ -12,10 +11,7 @@ from gg.builtins.branches.gg_branches import find
 @pass_config
 def cleanup(config, searchstring):
     """Deletes a found branch locally and remotely."""
-    try:
-        repo = get_repo()
-    except git.InvalidGitRepositoryError as exception:
-        error_out('"{}" is not a git repository'.format(exception.args[0]))
+    repo = config.repo
 
     branches_ = list(find(repo, searchstring))
     if not branches_:

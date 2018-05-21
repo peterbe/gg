@@ -1,6 +1,4 @@
-import git
-
-from gg.utils import error_out, get_repo, info_out
+from gg.utils import error_out, info_out
 from gg.state import read
 from gg.main import cli, pass_config
 
@@ -10,10 +8,7 @@ from gg.main import cli, pass_config
 def getback(config):
     """Goes back to the master branch, deletes the current branch locally
     and remotely."""
-    try:
-        repo = get_repo()
-    except git.InvalidGitRepositoryError as exception:
-        error_out('"{}" is not a git repository'.format(exception.args[0]))
+    repo = config.repo
 
     active_branch = repo.active_branch
     if active_branch.name == "master":

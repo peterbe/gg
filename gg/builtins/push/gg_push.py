@@ -1,7 +1,7 @@
 import git
 import click
 
-from gg.utils import error_out, get_repo, info_out
+from gg.utils import error_out, info_out
 from gg.state import read
 from gg.main import cli, pass_config
 
@@ -11,10 +11,7 @@ from gg.main import cli, pass_config
 @pass_config
 def push(config, force=False):
     """Create push the current branch."""
-    try:
-        repo = get_repo()
-    except git.InvalidGitRepositoryError as exception:
-        error_out('"{}" is not a git repository'.format(exception.args[0]))
+    repo = config.repo
 
     active_branch = repo.active_branch
     if active_branch.name == "master":

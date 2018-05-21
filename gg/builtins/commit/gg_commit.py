@@ -7,7 +7,7 @@ import re
 import git
 import click
 
-from gg.utils import error_out, get_repo, info_out, success_out, is_github, is_bugzilla
+from gg.utils import error_out, info_out, success_out, is_github, is_bugzilla
 from gg.state import read, load
 from gg.main import cli, pass_config
 from gg.builtins import github
@@ -25,10 +25,7 @@ from gg.builtins import github
 @pass_config
 def commit(config, no_verify):
     """Commit the current branch with all files."""
-    try:
-        repo = get_repo()
-    except git.InvalidGitRepositoryError as exception:
-        error_out('"{}" is not a git repository'.format(exception.args[0]))
+    repo = config.repo
 
     active_branch = repo.active_branch
     if active_branch.name == "master":
@@ -76,7 +73,7 @@ def commit(config, no_verify):
 
     if untracked_files:
         ordered = sorted(untracked_files.items(), key=lambda x: x[1], reverse=True)
-        print("NOTE! There are untracked files:")
+        info_out("NOTE! There are untracked files:")
         for path, age in ordered:
             if os.path.isdir(path):
                 path = path + "/"
@@ -165,8 +162,7 @@ def commit(config, no_verify):
         else:
             commit = index.commit(msg, skip_hooks=True)
 
-    if config.verbose:
-        success_out("Commit created {}".format(commit.hexsha))
+    success_out("Commit created {}".format(commit.hexsha))
 
     if not state.get("FORK_NAME"):
         info_out("Can't help you push the commit. Please run: gg config --help")

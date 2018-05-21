@@ -3,7 +3,6 @@ import os
 import tempfile
 import shutil
 
-import git
 import pytest
 import requests_mock
 from click.testing import CliRunner
@@ -87,21 +86,6 @@ def test_start_weird_description(temp_configfile, mocker):
         key = "gg-start-test:" + expected_branchname
         assert key in saved
         assert saved[key]["description"] == summary.strip()
-
-
-def test_start_not_a_git_repo(temp_configfile, mocker):
-    mocked_git = mocker.patch("git.Repo")
-
-    mocked_git.side_effect = git.InvalidGitRepositoryError("/some/place")
-
-    runner = CliRunner()
-    config = Config()
-    config.configfile = temp_configfile
-    result = runner.invoke(start, [""], obj=config)
-    assert result.exit_code == 1
-    assert '"/some/place" is not a git repository' in result.output
-    assert "Aborted!" in result.output
-    assert result.exception
 
 
 def test_start_a_digit(temp_configfile, mocker, requestsmock):

@@ -2,17 +2,24 @@ import os
 from pkg_resources import iter_entry_points
 
 import click
+import git
 
 from . import state
+from .utils import error_out, get_repo
+
 
 DEFAULT_CONFIGFILE = os.path.expanduser("~/.gg.json")
 
 
-class Config(object):
+class Config:
 
     def __init__(self):
         self.verbose = False  # default
         self.configfile = DEFAULT_CONFIGFILE
+        try:
+            self.repo = get_repo()
+        except git.InvalidGitRepositoryError as exception:
+            error_out('"{}" is not a git repository'.format(exception.args[0]))
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
@@ -41,6 +48,7 @@ from .builtins import bugzilla  # noqa
 from .builtins import github  # noqa
 from .builtins import config as _  # noqa
 from .builtins.commit import gg_commit  # noqa
+from .builtins.merge import gg_merge  # noqa
 from .builtins.start import gg_start  # noqa
 from .builtins.push import gg_push  # noqa
 from .builtins.getback import gg_getback  # noqa

@@ -2,10 +2,9 @@ import re
 import getpass
 import urllib
 
-import git
 import click
 
-from gg.utils import error_out, get_repo, info_out, is_github
+from gg.utils import error_out, info_out, is_github
 from gg.state import save, read
 from gg.main import cli, pass_config
 from gg.builtins import bugzilla
@@ -17,11 +16,7 @@ from gg.builtins import github
 @pass_config
 def start(config, bugnumber=""):
     """Create a new topic branch."""
-    try:
-        repo = get_repo()
-    except git.InvalidGitRepositoryError as exception:
-        print("OH NO!")
-        error_out('"{}" is not a git repository'.format(exception.args[0]))
+    repo = config.repo
 
     if bugnumber:
         summary, bugnumber, url = get_summary(config, bugnumber)
@@ -89,7 +84,7 @@ def get_summary(config, bugnumber):
     if bugnumber.isdigit():
         # try both and see if one of them turns up something interesting
 
-        repo = get_repo()
+        repo = config.repo
         state = read(config.configfile)
         fork_name = state.get("FORK_NAME", getpass.getuser())
         if config.verbose:

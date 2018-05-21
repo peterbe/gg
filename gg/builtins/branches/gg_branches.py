@@ -1,9 +1,8 @@
 import datetime
 
-import git
 import click
 
-from gg.utils import error_out, get_repo, info_out, success_out
+from gg.utils import error_out, info_out, success_out
 
 from gg.main import cli, pass_config
 
@@ -13,10 +12,7 @@ from gg.main import cli, pass_config
 @pass_config
 def branches(config, searchstring=""):
     """List all branches. And if exactly 1 found, offer to check it out."""
-    try:
-        repo = get_repo()
-    except git.InvalidGitRepositoryError as exception:
-        error_out('"{}" is not a git repository'.format(exception.args[0]))
+    repo = config.repo
 
     branches_ = list(find(repo, searchstring))
     if branches_:
