@@ -48,3 +48,5 @@ def merge(config):
         print("PUSHING TO ", repr(upstream_remote))
         upstream_remote.push("master")
         success_out("Current master pushed to {}".format(upstream_remote.name))
+
+    # XXX perhaps we should delete the branch off the fork remote if it exists
