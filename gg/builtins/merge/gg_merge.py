@@ -24,7 +24,6 @@ def merge(config):
 
     state = read(config.configfile)
     origin_name = state.get("ORIGIN_NAME", "origin")
-    print("ORIGIN_NAME", origin_name)
     upstream_remote = None
     for remote in repo.remotes:
         if remote.name == origin_name:
@@ -45,7 +44,6 @@ def merge(config):
 
     push_for_you = input("Run that push? [Y/n] ").lower().strip() != "n"
     if push_for_you:
-        print("PUSHING TO ", repr(upstream_remote))
         upstream_remote.push("master")
         success_out("Current master pushed to {}".format(upstream_remote.name))
 
