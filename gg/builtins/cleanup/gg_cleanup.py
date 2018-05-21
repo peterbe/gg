@@ -1,51 +1,43 @@
+import click
 import git
 
 from gg.utils import error_out, get_repo, info_out
 from gg.state import read
 from gg.main import cli, pass_config
+from gg.builtins.branches.gg_branches import find
 
 
 @cli.command()
+@click.argument("searchstring")
 @pass_config
-def getback(config):
-    """Goes back to the master branch, deletes the current branch locally
-    and remotely."""
+def cleanup(config, searchstring):
+    """Deletes a found branch locally and remotely."""
     try:
         repo = get_repo()
     except git.InvalidGitRepositoryError as exception:
         error_out('"{}" is not a git repository'.format(exception.args[0]))
 
-    active_branch = repo.active_branch
-    if active_branch.name == "master":
-        error_out("You're already on the master branch.")
-
-    if repo.is_dirty():
+    branches_ = list(find(repo, searchstring))
+    if not branches_:
+        error_out("No branches found")
+    elif len(branches_) > 1:
         error_out(
-            'Repo is "dirty". ({})'.format(
-                ", ".join([repr(x.b_path) for x in repo.index.diff(None)])
+            "More than one branch found.{}".format(
+                "\n\t".join([""] + [x.name for x in branches_])
             )
         )
 
-    branch_name = active_branch.name
-
-    state = read(config.configfile)
-    origin_name = state.get("ORIGIN_NAME", "origin")
-    upstream_remote = None
-    fork_remote = None
-    for remote in repo.remotes:
-        if remote.name == origin_name:
-            # remote.pull()
-            upstream_remote = remote
-            break
-    if not upstream_remote:
-        error_out("No remote called {!r} found".format(origin_name))
+    assert len(branches_) == 1
+    branch_name = branches_[0].name
+    active_branch = repo.active_branch
+    if branch_name == active_branch.name:
+        error_out("Can't clean up the current active branch.")
+    # branch_name = active_branch.name
 
     # Check out master
-    repo.heads.master.checkout()
-    upstream_remote.pull(repo.heads.master)
-
+    # repo.heads.master.checkout()
     # Is this one of the merged branches?!
-    # XXX I don't know how to do this "natively" with GitPython.
+    # XXX I don't know how to do this "nativly" with GitPython.
     merged_branches = [
         x.strip()
         for x in repo.git.branch("--merged").splitlines()
@@ -69,6 +61,7 @@ def getback(config):
         repo.git.branch("-D", branch_name)
 
     fork_remote = None
+    state = read(config.configfile)
     for remote in repo.remotes:
         if remote.name == state.get("FORK_NAME"):
             fork_remote = remote
