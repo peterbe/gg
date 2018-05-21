@@ -46,5 +46,5 @@ def merge(config):
     push_for_you = input("Run that push? [Y/n] ").lower().strip() != "n"
     if push_for_you:
         print("PUSHING TO ", repr(upstream_remote))
-        upstream_remote.push(branch_name)
+        upstream_remote.push("master")
         success_out("Current master pushed to {}".format(upstream_remote.name))
