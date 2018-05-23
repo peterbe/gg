@@ -181,13 +181,13 @@ def test_start_github_issue(temp_configfile, mocker, requestsmock):
     assert result.exit_code == 0
     assert not result.exception
 
-    mocked_git().create_head.assert_called_with("issue-7-foo-bar")
+    mocked_git().create_head.assert_called_with("7-foo-bar")
     mocked_git().create_head().checkout.assert_called_with()
 
     with open(temp_configfile) as f:
         saved = json.load(f)
 
-        key = "gg-start-test:issue-7-foo-bar"
+        key = "gg-start-test:7-foo-bar"
         assert key in saved
         assert saved[key]["description"] == 'foo "bar"'
         assert saved[key]["date"]
@@ -227,13 +227,13 @@ def test_start_bugzilla_url(temp_configfile, mocker, requestsmock):
     assert result.exit_code == 0
     assert not result.exception
 
-    mocked_git().create_head.assert_called_with("bug-123456-foo-bar")
+    mocked_git().create_head.assert_called_with("123456-foo-bar")
     mocked_git().create_head().checkout.assert_called_with()
 
     with open(temp_configfile) as f:
         saved = json.load(f)
 
-        key = "gg-start-test:bug-123456-foo-bar"
+        key = "gg-start-test:123456-foo-bar"
         assert key in saved
         assert saved[key]["description"] == 'foo "bar"'
         assert saved[key]["date"]
