@@ -32,9 +32,9 @@ def start(config, bugnumber=""):
     branch_name = ""
     if bugnumber:
         if is_github({"bugnumber": bugnumber, "url": url}):
-            branch_name = "issue-{}-".format(bugnumber)
+            branch_name = "{}-".format(bugnumber)
         else:
-            branch_name = "bug-{}-".format(bugnumber)
+            branch_name = "{}-".format(bugnumber)
 
     def clean_branch_name(string):
         string = re.sub("\s+", " ", string)
