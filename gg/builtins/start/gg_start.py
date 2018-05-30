@@ -9,6 +9,7 @@ from gg.state import save, read
 from gg.main import cli, pass_config
 from gg.builtins import bugzilla
 from gg.builtins import github
+from gg.builtins.branches.gg_branches import find
 
 
 @cli.command()
@@ -46,6 +47,11 @@ def start(config, bugnumber=""):
         return string.lower().strip()
 
     branch_name += clean_branch_name(summary)
+
+    # Check that the branch doesn't already exist
+    found = list(find(repo, branch_name, exact=True))
+    if found:
+        error_out("There is already a branch called {!r}".format(found[0].name))
 
     new_branch = repo.create_head(branch_name)
     new_branch.checkout()

@@ -95,7 +95,6 @@ def test_start_a_digit(temp_configfile, mocker, requestsmock):
     remotes = []
 
     class Remote:
-
         def __init__(self, name, url):
             self.name = name
             self.url = url
