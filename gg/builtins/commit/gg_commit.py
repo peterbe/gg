@@ -102,10 +102,12 @@ def commit(config, no_verify):
             "No branch information available."
         )
 
+    msg = data["description"]
     if data.get("bugnumber"):
-        msg = "bug {} - {}".format(data["bugnumber"], data["description"])
-    else:
-        msg = data["description"]
+        if is_bugzilla(data):
+            msg = "bug {} - {}".format(data["bugnumber"], data["description"])
+        elif is_github(data):
+            msg = "{}, #{}".format(data["description"], data["bugnumber"])
 
     print("Commit message: (type a new one if you want to override)")
 
@@ -123,7 +125,10 @@ def commit(config, no_verify):
             if is_bugzilla(data):
                 msg = "fixes " + msg
             elif is_github(data):
-                msg += ", fixes #{}".format(data["bugnumber"])
+                msg = msg.replace(
+                    ", #{}".format(data["bugnumber"]),
+                    ", fixes #{}".format(data["bugnumber"]),
+                )
             else:
                 raise NotImplementedError
 
@@ -229,7 +234,7 @@ def commit(config, no_verify):
         )
         print("Now, to make a Pull Request, go to:")
         print("")
-        print(github_url)
+        success_out(github_url)
     print("(⌘-click to open URLs)")
 
     return 0

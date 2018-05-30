@@ -39,11 +39,15 @@ def branches(config, searchstring=""):
         error_out("Found no branches.")
 
 
-def find(repo, searchstring):
+def find(repo, searchstring, exact=False):
     for head in repo.heads:
         if searchstring:
-            if searchstring.lower() not in head.name.lower():
-                continue
+            if exact:
+                if searchstring.lower() != head.name.lower():
+                    continue
+            else:
+                if searchstring.lower() not in head.name.lower():
+                    continue
         yield head
 
 
@@ -55,7 +59,6 @@ def get_merged_branches(repo):
 
 
 def print_list(heads, merged_names):
-
     def wrap(head):
         try:
             log = head.log()
