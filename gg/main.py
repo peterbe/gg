@@ -12,7 +12,6 @@ DEFAULT_CONFIGFILE = os.path.expanduser("~/.gg.json")
 
 
 class Config:
-
     def __init__(self):
         self.verbose = False  # default
         self.configfile = DEFAULT_CONFIGFILE

@@ -27,7 +27,6 @@ def temp_configfile():
 
 
 class MockDiff:
-
     def __init__(self, path, deleted_file=False):
         self.b_path = path
         self.deleted_file = deleted_file
