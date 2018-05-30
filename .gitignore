@@ -6,3 +6,4 @@ build/
 htmlcov/
 .pytest_cache/
 *.egg-info/
+.vscode/tags
