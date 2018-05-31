@@ -141,7 +141,10 @@ def commit(config, no_verify):
             files_removed.append(x.b_path)
         else:
             files_added.append(x.b_path)
-    if not (files_added or files_removed):
+    files_new = []
+    for x in repo.index.diff(repo.head.commit):
+        files_new.append(x.b_path)
+    if not (files_added or files_removed or files_new):
         error_out("No files to add or remove")
     if not repo.is_dirty():
         error_out("Branch is not dirty. There is nothing to commit.")
