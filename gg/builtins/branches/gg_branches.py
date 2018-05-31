@@ -19,7 +19,7 @@ def branches(config, searchstring=""):
         merged = get_merged_branches(repo)
         info_out("Found existing branches...")
         print_list(branches_, merged)
-        if len(branches_) == 1:
+        if len(branches_) == 1 and searchstring:
             # If the found branch is the current one, error
             active_branch = repo.active_branch
             if active_branch == branches_[0]:
