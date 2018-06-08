@@ -46,7 +46,10 @@ def cleanup(config, searchstring):
         # XXX This is where we could get smart and compare this branch
         # with the master.
         certain = (
-            input("Are you certain it's actually merged? [Y/n] ").lower().strip() != "n"
+            input(f"Are you certain {branch_name} is actually merged? [Y/n] ")
+            .lower()
+            .strip()
+            != "n"
         )
     if not certain:
         return 1
