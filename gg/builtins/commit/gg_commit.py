@@ -144,33 +144,40 @@ def commit(config, no_verify):
     files_new = []
     for x in repo.index.diff(repo.head.commit):
         files_new.append(x.b_path)
-    if not (files_added or files_removed or files_new):
-        error_out("No files to add or remove")
-    if not repo.is_dirty():
-        error_out("Branch is not dirty. There is nothing to commit.")
-    if files_added:
-        index.add(files_added)
-    if files_removed:
-        index.remove(files_removed)
-    try:
-        commit = index.commit(msg)
-    except git.exc.HookExecutionError as exception:
-        if not no_verify:
-            info_out(
-                "Commit hook failed ({}, exit code {})".format(
-                    exception.command, exception.status
-                )
-            )
-            if exception.stdout:
-                error_out(exception.stdout)
-            elif exception.stderr:
-                error_out(exception.stderr)
-            else:
-                error_out("Commit hook failed.")
-        else:
-            commit = index.commit(msg, skip_hooks=True)
 
-    success_out("Commit created {}".format(commit.hexsha))
+    proceed = True
+    if not (files_added or files_removed or files_new):
+        info_out("No files to add or remove.")
+        proceed = False
+        if input("Proceed anyway? [Y/n] ").lower().strip() == "n":
+            proceed = True
+
+    if proceed:
+        if not repo.is_dirty():
+            error_out("Branch is not dirty. There is nothing to commit.")
+        if files_added:
+            index.add(files_added)
+        if files_removed:
+            index.remove(files_removed)
+        try:
+            commit = index.commit(msg)
+        except git.exc.HookExecutionError as exception:
+            if not no_verify:
+                info_out(
+                    "Commit hook failed ({}, exit code {})".format(
+                        exception.command, exception.status
+                    )
+                )
+                if exception.stdout:
+                    error_out(exception.stdout)
+                elif exception.stderr:
+                    error_out(exception.stderr)
+                else:
+                    error_out("Commit hook failed.")
+            else:
+                commit = index.commit(msg, skip_hooks=True)
+
+        success_out("Commit created {}".format(commit.hexsha))
 
     if not state.get("FORK_NAME"):
         info_out("Can't help you push the commit. Please run: gg config --help")
