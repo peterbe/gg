@@ -53,7 +53,7 @@ def getback(config):
         # XXX This is where we could get smart and compare this branch
         # with the master.
         certain = (
-            input(f"Are you certain {branch_name} is actually merged? [Y/n] ")
+            input("Are you certain {} is actually merged? [Y/n] ".format(branch_name))
             .lower()
             .strip()
             != "n"

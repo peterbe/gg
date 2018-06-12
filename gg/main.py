@@ -51,6 +51,7 @@ from .builtins.merge import gg_merge  # noqa
 from .builtins.start import gg_start  # noqa
 from .builtins.push import gg_push  # noqa
 from .builtins.getback import gg_getback  # noqa
+from .builtins.rebase import gg_rebase  # noqa
 from .builtins.branches import gg_branches  # noqa
 from .builtins.cleanup import gg_cleanup  # noqa
 
