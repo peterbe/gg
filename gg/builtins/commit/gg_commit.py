@@ -102,33 +102,24 @@ def commit(config, no_verify):
             "No branch information available."
         )
 
+    print("Commit message: (type a new one if you want to override)")
     msg = data["description"]
     if data.get("bugnumber"):
         if is_bugzilla(data):
             msg = "bug {} - {}".format(data["bugnumber"], data["description"])
+            msg = input('"{}" '.format(msg)).strip() or msg
         elif is_github(data):
-            msg = "{}, #{}".format(data["description"], data["bugnumber"])
-
-    print("Commit message: (type a new one if you want to override)")
-
-    msg = input('"{}" '.format(msg)).strip() or msg
+            msg = input('"{}" '.format(msg)).strip() or msg
+            msg += "\n\nPart of #{}".format(data["bugnumber"])
 
     if data["bugnumber"]:
-        if is_bugzilla(data):
-            question = 'Add the "fixes" prefix? [N/y] '
-        elif is_github(data):
-            question = 'Add the "fixes" suffix? [N/y] '
-        else:
-            raise NotImplementedError("Don't know what issue tracker you use :(")
+        question = 'Add the "fixes" mention? [N/y] '
         fixes = input(question).lower().strip()
         if fixes in ("y", "yes"):
             if is_bugzilla(data):
                 msg = "fixes " + msg
             elif is_github(data):
-                msg = msg.replace(
-                    ", #{}".format(data["bugnumber"]),
-                    ", fixes #{}".format(data["bugnumber"]),
-                )
+                msg = msg.replace('Part of ', 'Fixes ')
             else:
                 raise NotImplementedError
 
