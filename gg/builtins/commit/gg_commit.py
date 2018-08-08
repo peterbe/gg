@@ -119,7 +119,7 @@ def commit(config, no_verify):
             if is_bugzilla(data):
                 msg = "fixes " + msg
             elif is_github(data):
-                msg = msg.replace('Part of ', 'Fixes ')
+                msg = msg.replace("Part of ", "Fixes ")
             else:
                 raise NotImplementedError
 
