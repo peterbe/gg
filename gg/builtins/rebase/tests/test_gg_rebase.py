@@ -52,4 +52,4 @@ def test_rebase(temp_configfile, mocker):
     assert result.exit_code == 0
     assert not result.exception
 
-    mocked_git().git.rebase.assert_called_with("origin/master")
+    mocked_git().git.rebase.assert_called_with("master")

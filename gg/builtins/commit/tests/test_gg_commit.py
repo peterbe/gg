@@ -139,8 +139,8 @@ def test_commit_no_files_to_add(temp_configfile, mocker):
     config = Config()
     config.configfile = temp_configfile
     result = runner.invoke(commit, [], input="\n", obj=config)
-    assert result.exit_code > 0
-    assert result.exception
+    assert result.exit_code == 0
+    assert not result.exception
     assert "No files to add" in result.output
 
 

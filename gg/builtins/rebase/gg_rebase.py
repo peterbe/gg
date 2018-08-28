@@ -32,7 +32,7 @@ def rebase(config):
         error_out("No remote called {!r} found".format(origin_name))
 
     repo.heads.master.checkout()
-    repo.remotes[origin_name].pull()
+    repo.remotes[origin_name].pull("master")
 
     repo.heads[active_branch_name].checkout()
 
