@@ -29,9 +29,22 @@ def cleanup(config, searchstring):
     if branch_name == active_branch.name:
         error_out("Can't clean up the current active branch.")
     # branch_name = active_branch.name
+    upstream_remote = None
+    fork_remote = None
+    state = read(config.configfile)
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    for remote in repo.remotes:
+        if remote.name == origin_name:
+            # remote.pull()
+            upstream_remote = remote
+            break
+    if not upstream_remote:
+        error_out("No remote called {!r} found".format(origin_name))
 
     # Check out master
-    # repo.heads.master.checkout()
+    repo.heads.master.checkout()
+    upstream_remote.pull(repo.heads.master)
+
     # Is this one of the merged branches?!
     # XXX I don't know how to do this "nativly" with GitPython.
     merged_branches = [
