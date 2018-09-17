@@ -62,6 +62,10 @@ def test_cleanup(temp_configfile, mocker):
     active_branch = mocker.MagicMock()
     mocked_git().active_branch = active_branch
 
+    mocked_remote = mocker.MagicMock()
+    mocked_remote.name = "origin"
+    mocked_git().remotes.__iter__.return_value = [mocked_remote]
+
     state = json.load(open(temp_configfile))
     state["FORK_NAME"] = "peterbe"
     with open(temp_configfile, "w") as f:
