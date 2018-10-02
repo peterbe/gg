@@ -18,9 +18,7 @@ def test_login(temp_configfile, mocker, requestsmock):
                 "name": "peterbe@example.com",
                 "id": 1,
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
 
     runner = CliRunner()
@@ -51,9 +49,7 @@ def test_test(temp_configfile, mocker, requestsmock):
         "https://example.com/rest/whoami?api_key=secret",
         content=json.dumps(
             {"real_name": "John Doe", "name": "peterbe@example.com", "id": 1}
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
 
     runner = CliRunner()
@@ -109,9 +105,7 @@ def test_get_summary(temp_configfile, mocker, requestsmock):
                 ],
                 "faults": [],
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
 
     config = Config()
@@ -144,15 +138,14 @@ def test_get_summary_with_token(temp_configfile, requestsmock):
                 ],
                 "faults": [],
             }
-        ).encode(
-            "utf-8"
-        ),
+        ).encode("utf-8"),
     )
 
     with open(temp_configfile, "w") as f:
         saved = {
             "BUGZILLA": {
-                "api_key": "secret", "bugzilla_url": "https://privatebugs.example.com"
+                "api_key": "secret",
+                "bugzilla_url": "https://privatebugs.example.com",
             }
         }
         json.dump(saved, f)

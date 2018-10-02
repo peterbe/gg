@@ -5,14 +5,14 @@ _here = path.dirname(__file__)
 
 
 setup(
-    name='gg',
-    version='0.0.18',
-    author='Peter Bengtsson',
-    author_email='mail@peterbe.com',
-    url='https://github.com/peterbe/gg',
-    description='Git and GitHub for the productivity addicted',
-    long_description=open(path.join(_here, 'README.rst')).read(),
-    license='MIT',
+    name="gg",
+    version="0.0.18",
+    author="Peter Bengtsson",
+    author_email="mail@peterbe.com",
+    url="https://github.com/peterbe/gg",
+    description="Git and GitHub for the productivity addicted",
+    long_description=open(path.join(_here, "README.rst")).read(),
+    license="MIT",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
@@ -24,17 +24,12 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    install_requires=[
-        'click',
-        'colorama',
-        'requests',
-        'GitPython',
-    ],
+    install_requires=["click", "colorama", "requests", "GitPython"],
     entry_points="""
         [console_scripts]
         gg=gg.main:cli
     """,
-    setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-mock', 'requests_mock'],
+    setup_requires=["pytest-runner"],
+    tests_require=["pytest", "pytest-mock", "requests_mock"],
     keywords="git click github bugzilla",
 )
