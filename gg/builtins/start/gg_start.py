@@ -44,6 +44,7 @@ def start(config, bugnumber=""):
         for each in "@%^&:'\"/(),[]{}!.?`$<>#*;=":
             string = string.replace(each, "")
         string = re.sub("-+", "-", string)
+        string = string.strip('-')
         return string.lower().strip()
 
     branch_name += clean_branch_name(summary)
