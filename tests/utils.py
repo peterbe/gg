@@ -7,12 +7,13 @@ import pytest
 
 @pytest.fixture()
 def temp_configfile(request):
-    cf = os.path.join(tempfile.gettempdir(), 'config.json')
-    with open(cf, 'w') as f:
+    cf = os.path.join(tempfile.gettempdir(), "config.json")
+    with open(cf, "w") as f:
         json.dump({}, f)
 
     def teardown():
         os.remove(cf)
+
     request.addfinalizer(teardown)
     return cf
 
