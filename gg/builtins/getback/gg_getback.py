@@ -1,11 +1,14 @@
+import click
+
 from gg.utils import error_out, info_out
 from gg.state import read
 from gg.main import cli, pass_config
 
 
 @cli.command()
+@click.option("-f", "--force", is_flag=True, default=False)
 @pass_config
-def getback(config):
+def getback(config, force=False):
     """Goes back to the master branch, deletes the current branch locally
     and remotely."""
     repo = config.repo
@@ -47,7 +50,7 @@ def getback(config):
         if x.strip() and not x.strip().startswith("*")
     ]
     was_merged = branch_name in merged_branches
-    certain = was_merged
+    certain = was_merged or force
     if not certain:
         # Need to ask the user.
         # XXX This is where we could get smart and compare this branch
