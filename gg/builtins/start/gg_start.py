@@ -49,6 +49,9 @@ def start(config, bugnumber=""):
 
     branch_name += clean_branch_name(summary)
 
+    if not branch_name:
+        error_out("Must provide a branch name")
+
     # Check that the branch doesn't already exist
     found = list(find(repo, branch_name, exact=True))
     if found:
