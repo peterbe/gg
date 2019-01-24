@@ -111,7 +111,9 @@ def test(config, issue_url):
         info_out("Using: {}".format(credentials["github_url"]))
 
     if issue_url:
-        github_url_regex = re.compile("https://github.com/([^/]+)/([^/]+)/issues/(\d+)")
+        github_url_regex = re.compile(
+            r"https://github.com/([^/]+)/([^/]+)/issues/(\d+)"
+        )
         org, repo, number = github_url_regex.search(issue_url).groups()
         title, _ = get_title(config, org, repo, number)
         if title:

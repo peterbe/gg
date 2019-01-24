@@ -213,7 +213,7 @@ def commit(config, no_verify):
         return 0
 
     origin = repo.remotes[state.get("ORIGIN_NAME", "origin")]
-    rest = re.split("github\.com[:/]", origin.url)[1]
+    rest = re.split(r"github\.com[:/]", origin.url)[1]
     org, repo = rest.split(".git")[0].split("/", 1)
 
     # Search for an existing open pull request, and remind us of the link

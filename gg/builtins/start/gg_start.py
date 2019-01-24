@@ -38,7 +38,7 @@ def start(config, bugnumber=""):
             branch_name = "{}-".format(bugnumber)
 
     def clean_branch_name(string):
-        string = re.sub("\s+", " ", string)
+        string = re.sub(r"\s+", " ", string)
         string = string.replace(" ", "-")
         string = string.replace("->", "-").replace("=>", "-")
         for each in "@%^&:'\"/(),[]{}!.?`$<>#*;=":
@@ -70,7 +70,7 @@ def get_summary(config, bugnumber):
     return None."""
 
     bugzilla_url_regex = re.compile(
-        re.escape("https://bugzilla.mozilla.org/show_bug.cgi?id=") + "(\d+)$"
+        re.escape("https://bugzilla.mozilla.org/show_bug.cgi?id=") + r"(\d+)$"
     )
 
     # The user could have pasted in a bugzilla ID or a bugzilla URL
@@ -82,7 +82,7 @@ def get_summary(config, bugnumber):
         return summary, bugzilla_id, url
 
     # The user could have pasted in a GitHub issue URL
-    github_url_regex = re.compile("https://github.com/([^/]+)/([^/]+)/issues/(\d+)")
+    github_url_regex = re.compile(r"https://github.com/([^/]+)/([^/]+)/issues/(\d+)")
     if github_url_regex.search(bugnumber.split("#")[0]):
         # that's also easy
         org, repo, id_, = github_url_regex.search(bugnumber.split("#")[0]).groups()
