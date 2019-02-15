@@ -7,9 +7,10 @@ from gg.builtins.branches.gg_branches import find
 
 
 @cli.command()
+@click.option("-f", "--force", is_flag=True, default=False)
 @click.argument("searchstring")
 @pass_config
-def cleanup(config, searchstring):
+def cleanup(config, searchstring, force=False):
     """Deletes a found branch locally and remotely."""
     repo = config.repo
 
@@ -53,7 +54,7 @@ def cleanup(config, searchstring):
         if x.strip() and not x.strip().startswith("*")
     ]
     was_merged = branch_name in merged_branches
-    certain = was_merged
+    certain = was_merged or force
     if not certain:
         # Need to ask the user.
         # XXX This is where we could get smart and compare this branch
