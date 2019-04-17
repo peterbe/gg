@@ -1,9 +1,0 @@
-{
-  "python.pythonPath": "/Users/peterbe/virtualenvs/gg/bin/python",
-  "editor.formatOnSave": true,
-  "python.linting.pylintEnabled": false,
-  "black.path": "/Users/peterbe/virtualenvs/gg/bin/black",
-  "python.linting.flake8Enabled": true,
-  "python.linting.enabled": true,
-  "editor.rulers": [88]
-}
