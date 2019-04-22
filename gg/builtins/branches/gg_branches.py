@@ -40,6 +40,10 @@ def branches(config, searchstring=""):
 
 
 def find(repo, searchstring, exact=False):
+    if searchstring and ":" in searchstring:
+        # When you copy-to-clipboard from GitHub you get something like
+        # 'peterbe:1545809-urllib3-1242' for example. Drop the prefix.
+        searchstring = searchstring.split(":")[-1]
     for head in repo.heads:
         if searchstring:
             if exact:
