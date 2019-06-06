@@ -4,6 +4,18 @@ from setuptools import setup, find_packages
 _here = path.dirname(__file__)
 
 
+dev_requirements = [
+    "tox==3.12.1",
+    "pytest==4.6.2",
+    "pytest-mock==1.10.4",
+    "pytest-cov==2.7.1",
+    "pytest-sugar==0.9.2",
+    "black==19.3b0",
+    "flake8==3.7.7",
+    "requests_mock==1.6.0",
+    "therapist==1.6.0",
+]
+
 setup(
     name="gg",
     version="0.0.18",
@@ -25,6 +37,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=["click", "colorama", "requests", "GitPython"],
+    extra_require={"dev": dev_requirements},
     entry_points="""
         [console_scripts]
         gg=gg.main:cli
