@@ -151,7 +151,9 @@ def commit(config, no_verify):
         if files_removed:
             index.remove(files_removed)
         try:
-            commit = index.commit(msg)
+            # Do it like this (instead of `repo.git.commit(msg)`)
+            # so that git signing works.
+            commit = repo.git.commit(["-m", msg])
         except git.exc.HookExecutionError as exception:
             if not no_verify:
                 info_out(
@@ -168,7 +170,7 @@ def commit(config, no_verify):
             else:
                 commit = index.commit(msg, skip_hooks=True)
 
-        success_out("Commit created {}".format(commit.hexsha))
+        success_out("Commit created {}".format(commit))
 
     if not state.get("FORK_NAME"):
         info_out("Can't help you push the commit. Please run: gg config --help")
@@ -226,6 +228,7 @@ def commit(config, no_verify):
         print("Pull Request already created:")
         print("")
         print("\t", pull_request["html_url"])
+        print("")
         break
     else:
         # If no known Pull Request exists, make a link to create a new one.
