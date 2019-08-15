@@ -177,7 +177,7 @@ def commit(config, no_verify):
         return 0
 
     try:
-        repo.remotes[state["FORK_NAME"]]
+        destination = repo.remotes[state["FORK_NAME"]]
     except IndexError:
         error_out("There is no remote called '{}'".format(state["FORK_NAME"]))
 
@@ -185,7 +185,7 @@ def commit(config, no_verify):
         input("Push branch to {}? [Y/n] ".format(state["FORK_NAME"])).lower().strip()
     )
     if push_for_you not in ("n", "no"):
-        destination = repo.remotes[state["FORK_NAME"]]
+        # destination = repo.remotes[state["FORK_NAME"]]
         pushed, = destination.push()
         # Was it rejected?
         if (

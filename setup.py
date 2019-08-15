@@ -37,7 +37,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=["click", "colorama", "requests", "GitPython"],
-    extra_require={"dev": dev_requirements},
+    extras_require={"dev": dev_requirements},
     entry_points="""
         [console_scripts]
         gg=gg.main:cli
