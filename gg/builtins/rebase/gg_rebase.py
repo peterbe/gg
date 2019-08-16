@@ -38,4 +38,4 @@ def rebase(config):
 
     print(repo.git.rebase("master"))
     success_out("Rebased against {}/master".format(origin_name))
-    info_out("If you wanto start interactive rebase run:\n\n\tgit rebase -i master\n")
+    info_out("If you want to start interactive rebase run:\n\n\tgit rebase -i master\n")
