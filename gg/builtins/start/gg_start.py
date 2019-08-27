@@ -39,8 +39,10 @@ def start(config, bugnumber=""):
 
     def clean_branch_name(string):
         string = re.sub(r"\s+", " ", string)
-        string = string.replace(" ", "-")
-        string = string.replace("->", "-").replace("=>", "-")
+        for each in " |":
+            string = string.replace(each, "-")
+        for each in ("->", "=>"):
+            string = string.replace(each, "-")
         for each in "@%^&:'\"/(),[]{}!.?`$<>#*;=":
             string = string.replace(each, "")
         string = re.sub("-+", "-", string)
