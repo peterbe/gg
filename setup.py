@@ -11,7 +11,7 @@ dev_requirements = [
     "pytest-cov==2.7.1",
     "pytest-sugar==0.9.2",
     "black==19.3b0",
-    "flake8==3.7.7",
+    "flake8==3.7.8",
     "requests_mock==1.6.0",
     "therapist==1.6.0",
 ]
