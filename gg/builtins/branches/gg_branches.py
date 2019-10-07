@@ -1,10 +1,15 @@
 import datetime
 
 import click
+import git
 
 from gg.utils import error_out, info_out, success_out
 
 from gg.main import cli, pass_config
+
+
+class InvalidRemoteName(Exception):
+    """when a remote doesn't exist"""
 
 
 @cli.command()
@@ -14,7 +19,30 @@ def branches(config, searchstring=""):
     """List all branches. And if exactly 1 found, offer to check it out."""
     repo = config.repo
 
-    branches_ = list(find(repo, searchstring))
+    try:
+        branches_ = list(find(repo, searchstring))
+    except InvalidRemoteName as exception:
+        remote_search_name = searchstring.split(":")[0]
+        if remote_search_name in [x.name for x in repo.remotes]:
+            error_out("Invalid remote name {!r}".format(exception))
+
+        repo_name, = [
+            x.url.split("/")[-1].split(".git")[0]
+            for x in repo.remotes
+            if x.name == "origin"
+        ]
+        # Add it and start again
+        remote_url = "https://github.com/{}/kuma.git".format(
+            remote_search_name, repo_name
+        )
+        if not click.confirm(
+            "Add remote '{}' ({})".format(remote_search_name, remote_url), default=True
+        ):
+            error_out("Unable to find or create remote")
+
+        repo.create_remote(remote_search_name, remote_url)
+        branches_ = list(find(repo, searchstring))
+
     if branches_:
         merged = get_merged_branches(repo)
         info_out("Found existing branches...")
@@ -40,10 +68,43 @@ def branches(config, searchstring=""):
 
 
 def find(repo, searchstring, exact=False):
+    # When you copy-to-clipboard from GitHub you get something like
+    # 'peterbe:1545809-urllib3-1242' for example.
+    # But first, it exists as a local branch, use that.
     if searchstring and ":" in searchstring:
-        # When you copy-to-clipboard from GitHub you get something like
-        # 'peterbe:1545809-urllib3-1242' for example. Drop the prefix.
-        searchstring = searchstring.split(":")[-1]
+        remote_name = searchstring.split(":")[0]
+        for remote in repo.remotes:
+            if remote.name == remote_name:
+                # remote.pull()
+                found_remote = remote
+                break
+        else:
+            raise InvalidRemoteName(remote_name)
+
+        for head in repo.heads:
+            if exact:
+                if searchstring.split(":", 1)[1].lower() == head.name.lower():
+                    yield head
+                    return
+            else:
+                if searchstring.split(":", 1)[1].lower() in head.name.lower():
+                    yield head
+                    return
+
+        info_out("Fetching the latest from {}".format(found_remote))
+        for fetchinfo in found_remote.fetch():
+            if fetchinfo.flags & git.remote.FetchInfo.HEAD_UPTODATE:
+                # Most boring
+                pass
+            else:
+                msg = "updated"
+                if fetchinfo.flags & git.remote.FetchInfo.FORCED_UPDATE:
+                    msg += " (force updated)"
+                print(fetchinfo.ref, msg)
+
+            if str(fetchinfo.ref) == searchstring.replace(":", "/", 1):
+                yield fetchinfo.ref
+
     for head in repo.heads:
         if searchstring:
             if exact:
