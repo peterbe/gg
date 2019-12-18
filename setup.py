@@ -6,9 +6,9 @@ _here = path.dirname(__file__)
 
 dev_requirements = [
     "tox==3.14.2",
-    "pytest==4.6.2",
-    "pytest-mock==1.10.4",
-    "pytest-cov==2.7.1",
+    "pytest==5.3.2",
+    "pytest-mock==1.13.0",
+    "pytest-cov==2.8.1",
     "pytest-sugar==0.9.2",
     "black==19.10b0",
     "flake8==3.7.9",
