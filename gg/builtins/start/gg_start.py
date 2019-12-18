@@ -78,7 +78,7 @@ def get_summary(config, bugnumber):
     # The user could have pasted in a bugzilla ID or a bugzilla URL
     if bugzilla_url_regex.search(bugnumber.split("#")[0]):
         # that's easy then!
-        bugzilla_id, = bugzilla_url_regex.search(bugnumber.split("#")[0]).groups()
+        (bugzilla_id,) = bugzilla_url_regex.search(bugnumber.split("#")[0]).groups()
         bugzilla_id = int(bugzilla_id)
         summary, url = bugzilla.get_summary(config, bugzilla_id)
         return summary, bugzilla_id, url
