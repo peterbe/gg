@@ -18,7 +18,7 @@ dev_requirements = [
 
 setup(
     name="gg",
-    version="0.0.18",
+    version="0.0.19",
     author="Peter Bengtsson",
     author_email="mail@peterbe.com",
     url="https://github.com/peterbe/gg",
