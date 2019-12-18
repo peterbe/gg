@@ -5,15 +5,15 @@ _here = path.dirname(__file__)
 
 
 dev_requirements = [
-    "tox==3.12.1",
+    "tox==3.14.2",
     "pytest==4.6.2",
     "pytest-mock==1.10.4",
     "pytest-cov==2.7.1",
     "pytest-sugar==0.9.2",
-    "black==19.3b0",
-    "flake8==3.7.8",
-    "requests_mock==1.6.0",
-    "therapist==1.6.0",
+    "black==19.10b0",
+    "flake8==3.7.9",
+    "requests_mock==1.7.0",
+    "therapist==2.0.0",
 ]
 
 setup(
@@ -28,8 +28,6 @@ setup(
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.5",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: Implementation :: CPython",
         "License :: OSI Approved :: MIT License",
     ],
