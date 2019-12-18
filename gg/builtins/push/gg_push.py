@@ -33,10 +33,10 @@ def push(config, force=False):
 
     destination = repo.remotes[state["FORK_NAME"]]
     if force:
-        pushed, = destination.push(force=True)
+        (pushed,) = destination.push(force=True)
         info_out(pushed.summary)
     else:
-        pushed, = destination.push()
+        (pushed,) = destination.push()
         print("PUSHED...")
         # print(pushed)
         # print(pushed.flags)
@@ -61,7 +61,7 @@ def push(config, force=False):
 
         try_force_push = input("Try to force push? [Y/n] ").lower().strip()
         if try_force_push not in ("no", "n"):
-            pushed, = destination.push(force=True)
+            (pushed,) = destination.push(force=True)
             info_out(pushed.summary)
         else:
             return 0

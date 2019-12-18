@@ -186,7 +186,7 @@ def commit(config, no_verify):
     )
     if push_for_you not in ("n", "no"):
         # destination = repo.remotes[state["FORK_NAME"]]
-        pushed, = destination.push()
+        (pushed,) = destination.push()
         # Was it rejected?
         if (
             pushed.flags & git.remote.PushInfo.REJECTED
@@ -196,7 +196,7 @@ def commit(config, no_verify):
 
             try_force_push = input("Try to force push? [Y/n] ").lower().strip()
             if try_force_push not in ("no", "n"):
-                pushed, = destination.push(force=True)
+                (pushed,) = destination.push(force=True)
                 info_out(pushed.summary)
             else:
                 return 0

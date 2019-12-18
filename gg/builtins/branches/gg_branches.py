@@ -26,7 +26,7 @@ def branches(config, searchstring=""):
         if remote_search_name in [x.name for x in repo.remotes]:
             error_out("Invalid remote name {!r}".format(exception))
 
-        repo_name, = [
+        (repo_name,) = [
             x.url.split("/")[-1].split(".git")[0]
             for x in repo.remotes
             if x.name == "origin"
