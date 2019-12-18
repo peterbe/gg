@@ -48,6 +48,7 @@ from .builtins import github  # noqa
 from .builtins import config as _  # noqa
 from .builtins.commit import gg_commit  # noqa
 from .builtins.merge import gg_merge  # noqa
+from .builtins.mastermerge import gg_mastermerge  # noqa
 from .builtins.start import gg_start  # noqa
 from .builtins.push import gg_push  # noqa
 from .builtins.getback import gg_getback  # noqa

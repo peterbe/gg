@@ -32,7 +32,7 @@ def branches(config, searchstring=""):
             if x.name == "origin"
         ]
         # Add it and start again
-        remote_url = "https://github.com/{}/kuma.git".format(
+        remote_url = "https://github.com/{}/{}.git".format(
             remote_search_name, repo_name
         )
         if not click.confirm(
