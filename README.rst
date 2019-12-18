@@ -19,7 +19,7 @@ connect to your GitHub account might need to store a GitHub Access Token.
 Installation
 ============
 
-**NOTE!** At the time of writing, ``gg`` requires Python 3.
+``gg`` requires Python 3.
 
 The idea is that you install ``gg`` globally::
 
@@ -32,10 +32,10 @@ virtual environment::
 
 If you don't want to install ``gg`` and its dependencies in either the
 current working virtual environment *or* in your global system Python,
-you can first install `pipsi <https://pypi.python.org/pypi/pipsi>`_
+you can first install `pipx <https://pypi.python.org/pypi/pipx>`_
 then once you've installed and set that up::
 
-    pipsi install gg
+    pipx install gg
 
 Next, you need to install some plugins. See
 `PLUGINS.rst <https://github.com/peterbe/gg/blob/master/PLUGINS.rst>`_
