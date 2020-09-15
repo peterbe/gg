@@ -16,7 +16,7 @@ def write(configfile, data):
 
 def save(configfile, description, branch_name, **extra):
     repo_name = get_repo_name()
-    key = "{}:{}".format(repo_name, branch_name)
+    key = f"{repo_name}:{branch_name}"
     new = {key: extra}
     new[key].update(
         {"description": description, "date": datetime.datetime.now().isoformat()}
@@ -26,7 +26,7 @@ def save(configfile, description, branch_name, **extra):
 
 def load(configfile, branch_name):
     # like read() but returning specifically the state for the current repo
-    key = "{}:{}".format(get_repo_name(), branch_name)
+    key = f"{get_repo_name()}:{branch_name}"
     return read(configfile)[key]
 
 

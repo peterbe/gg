@@ -18,7 +18,7 @@ class Config:
         try:
             self.repo = get_repo()
         except git.InvalidGitRepositoryError as exception:
-            error_out('"{}" is not a git repository'.format(exception.args[0]))
+            error_out(f"{exception.args[0]} is not a git repository")
 
 
 pass_config = click.make_pass_decorator(Config, ensure=True)
@@ -30,7 +30,7 @@ pass_config = click.make_pass_decorator(Config, ensure=True)
     "-c",
     "--configfile",
     default=DEFAULT_CONFIGFILE,
-    help="Path to the config file (default: {})".format(DEFAULT_CONFIGFILE),
+    help=f"Path to the config file (default: {DEFAULT_CONFIGFILE})",
 )
 @pass_config
 def cli(config, configfile, verbose):

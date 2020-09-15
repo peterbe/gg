@@ -13,14 +13,15 @@ def push(config, force=False):
     """Create push the current branch."""
     repo = config.repo
 
+    state = read(config.configfile)
+    default_branch = state.get("DEFAULT_BRANCH", "master")
+
     active_branch = repo.active_branch
-    if active_branch.name == "master":
+    if active_branch.name == default_branch:
         error_out(
-            "Can't commit when on the master branch. "
+            f"Can't commit when on the {default_branch} branch. "
             "You really ought to do work in branches."
         )
-
-    state = read(config.configfile)
 
     if not state.get("FORK_NAME"):
         info_out("Can't help you push the commit. Please run: gg config --help")

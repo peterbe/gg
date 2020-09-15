@@ -24,7 +24,7 @@ def branches(config, searchstring=""):
     except InvalidRemoteName as exception:
         remote_search_name = searchstring.split(":")[0]
         if remote_search_name in [x.name for x in repo.remotes]:
-            error_out("Invalid remote name {!r}".format(exception))
+            error_out(f"Invalid remote name {exception!r}")
 
         (repo_name,) = [
             x.url.split("/")[-1].split(".git")[0]
@@ -32,11 +32,9 @@ def branches(config, searchstring=""):
             if x.name == "origin"
         ]
         # Add it and start again
-        remote_url = "https://github.com/{}/{}.git".format(
-            remote_search_name, repo_name
-        )
+        remote_url = f"https://github.com/{remote_search_name}/{repo_name}.git"
         if not click.confirm(
-            "Add remote '{}' ({})".format(remote_search_name, remote_url), default=True
+            f"Add remote {remote_search_name!r} ({remote_url})", default=True
         ):
             error_out("Unable to find or create remote")
 
@@ -51,18 +49,17 @@ def branches(config, searchstring=""):
             # If the found branch is the current one, error
             active_branch = repo.active_branch
             if active_branch == branches_[0]:
-                error_out("You're already on '{}'".format(branches_[0].name))
+                error_out(f"You're already on {branches_[0].name!r}")
             branch_name = branches_[0].name
             if len(branch_name) > 50:
                 branch_name = branch_name[:47] + "…"
             check_it_out = (
-                input("Check out '{}'? [Y/n] ".format(branch_name)).lower().strip()
-                != "n"
+                input(f"Check out {branch_name!r}? [Y/n] ").lower().strip() != "n"
             )
             if check_it_out:
                 branches_[0].checkout()
     elif searchstring:
-        error_out("Found no branches matching '{}'.".format(searchstring))
+        error_out(f"Found no branches matching {searchstring!r}.")
     else:
         error_out("Found no branches.")
 
@@ -91,7 +88,7 @@ def find(repo, searchstring, exact=False):
                     yield head
                     return
 
-        info_out("Fetching the latest from {}".format(found_remote))
+        info_out(f"Fetching the latest from {found_remote}")
         for fetchinfo in found_remote.fetch():
             if fetchinfo.flags & git.remote.FetchInfo.HEAD_UPTODATE:
                 # Most boring
@@ -166,7 +163,7 @@ def print_list(heads, merged_names):
             + (each["head"].name in merged_names and " (MERGED ALREADY)" or "")
         )
         if each.get("error"):
-            info_out("\tError getting ref log ({!r})".format(each["error"]))
+            info_out(f"\tError getting ref log ({each['error']!r})")
         info_out("\t" + each["info"]["date"].isoformat())
         info_out("\t" + format_age(each["info"]["date"]))
         info_out("\t" + format_msg(each["info"].get("message", "*no commit yet*")))

@@ -18,7 +18,7 @@ GITHUB_URL = "https://api.github.com"
     "-u",
     "--github-url",
     default=GITHUB_URL,
-    help="URL to GitHub instance (default: {})".format(GITHUB_URL),
+    help=f"URL to GitHub instance (default: {GITHUB_URL})",
 )
 @pass_config
 def github(config, github_url):
@@ -43,7 +43,7 @@ def token(config, token):
         token = getpass.getpass("GitHub API Token: ").strip()
     url = urllib.parse.urljoin(config.github_url, "/user")
     assert url.startswith("https://"), url
-    response = requests.get(url, headers={"Authorization": "token {}".format(token)})
+    response = requests.get(url, headers={"Authorization": f"token {token}"})
     if response.status_code == 200:
         update(
             config.configfile,
@@ -56,9 +56,9 @@ def token(config, token):
             },
         )
         name = response.json()["name"] or response.json()["login"]
-        success_out("Hi! {}".format(name))
+        success_out(f"Hi! {name}")
     else:
-        error_out("Failed - {} ({})".format(response.status_code, response.content))
+        error_out(f"Failed - {response.status_code} ({response.content})")
 
 
 @github.command()
@@ -80,21 +80,19 @@ def get_title(config, org, repo, number):
     credentials = state.get("GITHUB")
     if credentials:
         base_url = state["GITHUB"]["github_url"]
-        headers["Authorization"] = "token {}".format(credentials["token"])
+        headers["Authorization"] = f"token {credentials['token']}"
         if config.verbose:
-            info_out("Using API token: {}".format(credentials["token"][:10] + "…"))
-    url = urllib.parse.urljoin(
-        base_url, "/repos/{}/{}/issues/{}".format(org, repo, number)
-    )
+            info_out(f'Using API token: {credentials["token"][:10] + "…"}')
+    url = urllib.parse.urljoin(base_url, f"/repos/{org}/{repo}/issues/{number}")
     if config.verbose:
-        info_out("GitHub URL: {}".format(url))
+        info_out(f"GitHub URL: {url}")
     assert url.startswith("https://"), url
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         data = response.json()
         return data["title"], data["html_url"]
     if config.verbose:
-        info_out("GitHub Response: {}".format(response))
+        info_out(f"GitHub Response: {response}")
     return None, None
 
 
@@ -108,7 +106,7 @@ def test(config, issue_url):
     if not credentials:
         error_out("No credentials saved. Run: gg github token")
     if config.verbose:
-        info_out("Using: {}".format(credentials["github_url"]))
+        info_out(f"Using: {credentials['github_url']}")
 
     if issue_url:
         github_url_regex = re.compile(
@@ -125,16 +123,12 @@ def test(config, issue_url):
         url = urllib.parse.urljoin(credentials["github_url"], "/user")
         assert url.startswith("https://"), url
         response = requests.get(
-            url, headers={"Authorization": "token {}".format(credentials["token"])}
+            url, headers={"Authorization": f"token {credentials['token']}"}
         )
         if response.status_code == 200:
             success_out(json.dumps(response.json(), indent=2))
         else:
-            error_out(
-                "Failed to query - {} ({})".format(
-                    response.status_code, response.json()
-                )
-            )
+            error_out(f"Failed to query - {response.status_code} ({response.json()})")
 
 
 def find_pull_requests(config, org, repo, **params):
@@ -144,12 +138,12 @@ def find_pull_requests(config, org, repo, **params):
     credentials = state.get("GITHUB")
     if credentials:
         # base_url = state['GITHUB']['github_url']
-        headers["Authorization"] = "token {}".format(credentials["token"])
+        headers["Authorization"] = f"token {credentials['token']}"
         if config.verbose:
-            info_out("Using API token: {}".format(credentials["token"][:10] + "…"))
-    url = urllib.parse.urljoin(base_url, "/repos/{}/{}/pulls".format(org, repo))
+            info_out(f'Using API token: {credentials["token"][:10] + "…"}')
+    url = urllib.parse.urljoin(base_url, f"/repos/{org}/{repo}/pulls")
     if config.verbose:
-        info_out("GitHub URL: {}".format(url))
+        info_out(f"GitHub URL: {url}")
     assert url.startswith("https://"), url
     response = requests.get(url, params, headers=headers)
     if response.status_code == 200:

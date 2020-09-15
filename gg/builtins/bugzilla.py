@@ -17,7 +17,7 @@ BUGZILLA_URL = "https://bugzilla.mozilla.org"
     "-u",
     "--bugzilla-url",
     default=BUGZILLA_URL,
-    help="URL to Bugzilla instance (default: {})".format(BUGZILLA_URL),
+    help=f"URL to Bugzilla instance (default: {BUGZILLA_URL})",
 )
 @pass_config
 def bugzilla(config, bugzilla_url):
@@ -47,7 +47,7 @@ def login(config, api_key=""):
     response = requests.get(url, params={"api_key": api_key})
     if response.status_code == 200:
         if response.json().get("error"):
-            error_out("Failed - {}".format(response.json()))
+            error_out(f"Failed - {response.json()}")
         else:
             update(
                 config.configfile,
@@ -61,7 +61,7 @@ def login(config, api_key=""):
             )
             success_out("Yay! It worked!")
     else:
-        error_out("Failed - {} ({})".format(response.status_code, response.json()))
+        error_out(f"Failed - {response.status_code} ({response.json()})")
 
 
 @bugzilla.command()
@@ -97,9 +97,7 @@ def get_summary(config, bugnumber):
         data = response.json()
         bug = data["bugs"][0]
 
-        bug_url = urllib.parse.urljoin(
-            base_url, "/show_bug.cgi?id={}".format(bug["id"])
-        )
+        bug_url = urllib.parse.urljoin(base_url, f"/show_bug.cgi?id={bug['id']}")
         return bug["summary"], bug_url
     return None, None
 
@@ -116,7 +114,7 @@ def test(config, bugnumber):
     if not credentials:
         error_out("No API Key saved. Run: gg bugzilla login")
     if config.verbose:
-        info_out("Using: {}".format(credentials["bugzilla_url"]))
+        info_out(f"Using: {credentials['bugzilla_url']}")
 
     if bugnumber:
         summary, _ = get_summary(config, bugnumber)
@@ -132,12 +130,8 @@ def test(config, bugnumber):
         response = requests.get(url, params={"api_key": credentials["api_key"]})
         if response.status_code == 200:
             if response.json().get("error"):
-                error_out("Failed! - {}".format(response.json()))
+                error_out(f"Failed! - {response.json()}")
             else:
                 success_out(json.dumps(response.json(), indent=2))
         else:
-            error_out(
-                "Failed to query - {} ({})".format(
-                    response.status_code, response.json()
-                )
-            )
+            error_out(f"Failed to query - {response.status_code} ({response.json()})")
