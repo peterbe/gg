@@ -6,12 +6,15 @@ from gg.main import cli, pass_config
 @cli.command()
 @pass_config
 def mastermerge(config):
-    """Merge the origin/master into the the current branch"""
+    """Merge the origin_name/default_branch into the the current branch"""
     repo = config.repo
 
+    state = read(config.configfile)
+    default_branch = state.get("DEFAULT_BRANCH", "master")
+
     active_branch = repo.active_branch
-    if active_branch.name == "master":
-        error_out("You're already on the master branch.")
+    if active_branch.name == default_branch:
+        error_out(f"You're already on the {default_branch} branch.")
     active_branch_name = active_branch.name
 
     if repo.is_dirty():
@@ -21,7 +24,6 @@ def mastermerge(config):
             )
         )
 
-    state = read(config.configfile)
     origin_name = state.get("ORIGIN_NAME", "origin")
     upstream_remote = None
     for remote in repo.remotes:
@@ -29,12 +31,12 @@ def mastermerge(config):
             upstream_remote = remote
             break
     if not upstream_remote:
-        error_out("No remote called {!r} found".format(origin_name))
+        error_out(f"No remote called {origin_name!r} found")
 
-    repo.heads.master.checkout()
-    repo.remotes[origin_name].pull("master")
+    repo.heads[default_branch].checkout()
+    repo.remotes[origin_name].pull(default_branch)
 
     repo.heads[active_branch_name].checkout()
 
-    repo.git.merge("master")
-    success_out("Merged against {}/master".format(origin_name))
+    repo.git.merge(default_branch)
+    success_out(f"Merged against {origin_name}/{default_branch}")

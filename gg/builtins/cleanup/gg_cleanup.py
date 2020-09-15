@@ -14,6 +14,9 @@ def cleanup(config, searchstring, force=False):
     """Deletes a found branch locally and remotely."""
     repo = config.repo
 
+    state = read(config.configfile)
+    default_branch = state.get("DEFAULT_BRANCH", "master")
+
     branches_ = list(find(repo, searchstring))
     if not branches_:
         error_out("No branches found")
@@ -32,7 +35,7 @@ def cleanup(config, searchstring, force=False):
     # branch_name = active_branch.name
     upstream_remote = None
     fork_remote = None
-    state = read(config.configfile)
+
     origin_name = state.get("ORIGIN_NAME", "origin")
     for remote in repo.remotes:
         if remote.name == origin_name:
@@ -42,9 +45,9 @@ def cleanup(config, searchstring, force=False):
     if not upstream_remote:
         error_out("No remote called {!r} found".format(origin_name))
 
-    # Check out master
-    repo.heads.master.checkout()
-    upstream_remote.pull(repo.heads.master)
+    # Check out default branch
+    repo.heads[default_branch].checkout()
+    upstream_remote.pull(repo.heads[default_branch])
 
     # Is this one of the merged branches?!
     # XXX I don't know how to do this "nativly" with GitPython.
@@ -58,7 +61,7 @@ def cleanup(config, searchstring, force=False):
     if not certain:
         # Need to ask the user.
         # XXX This is where we could get smart and compare this branch
-        # with the master.
+        # with the default branch.
         certain = (
             input("Are you certain {} is actually merged? [Y/n] ".format(branch_name))
             .lower()

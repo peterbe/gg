@@ -10,10 +10,10 @@ dev_requirements = [
     "pytest-mock==1.13.0",
     "pytest-cov==2.8.1",
     "pytest-sugar==0.9.2",
-    "black==19.10b0",
-    "flake8==3.7.9",
+    "black==20.8b1",
+    "flake8==3.8.3",
     "requests_mock==1.7.0",
-    "therapist==2.0.0",
+    "therapist==2.1.0",
 ]
 
 setup(

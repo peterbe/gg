@@ -18,18 +18,30 @@ from gg.main import cli, pass_config
     default="",
     help="Name of the remote which is the origin remote.",
 )
+@click.option(
+    "-b",
+    "--default-branch",
+    default="",
+    help="Name of the default branch.",
+)
 @pass_config
-def config(config, fork_name="", origin_name=""):
+def config(config, fork_name="", origin_name="", default_branch=""):
     """Setting various configuration options"""
     state = read(config.configfile)
-    any_set = False
     if fork_name:
         update(config.configfile, {"FORK_NAME": fork_name})
-        success_out("fork-name set to: {}".format(fork_name))
-        any_set = True
+        success_out(f"fork-name set to: {fork_name}")
+    else:
+        info_out(f"fork-name: {state['FORK_NAME']}")
+
     if origin_name:
         update(config.configfile, {"ORIGIN_NAME": origin_name})
-        success_out("origin-name set to: {}".format(origin_name))
-        any_set = True
-    if not any_set:
-        info_out("Fork-name: {}".format(state["FORK_NAME"]))
+        success_out(f"origin-name set to: {origin_name}")
+    else:
+        info_out(f"origin-name: {state.get('ORIGIN_NAME', '*not set*')}")
+
+    if default_branch:
+        update(config.configfile, {"DEFAULT_BRANCH": default_branch})
+        success_out(f"default-branch set to: {default_branch}")
+    else:
+        info_out(f"default-branch: {state.get('DEFAULT_BRANCH', '*not set*')}")
