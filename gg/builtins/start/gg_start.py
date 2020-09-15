@@ -87,7 +87,11 @@ def get_summary(config, bugnumber):
     github_url_regex = re.compile(r"https://github.com/([^/]+)/([^/]+)/issues/(\d+)")
     if github_url_regex.search(bugnumber.split("#")[0]):
         # that's also easy
-        org, repo, id_, = github_url_regex.search(bugnumber.split("#")[0]).groups()
+        (
+            org,
+            repo,
+            id_,
+        ) = github_url_regex.search(bugnumber.split("#")[0]).groups()
         id_ = int(id_)
         title, url = github.get_title(config, org, repo, id_)
         return title.strip(), id_, url
