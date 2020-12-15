@@ -1,4 +1,5 @@
 import os
+import subprocess
 from urllib.parse import urlparse
 
 import click
@@ -42,3 +43,18 @@ def is_bugzilla(data):
     if data.get("bugnumber") and data.get("url"):
         return "bugzilla" in urlparse(data["url"]).netloc
     return False
+
+
+def get_default_branch(repo, origin_name):
+    # TODO: Figure out how to do this with GitPython
+    res = subprocess.run(
+        f"git remote show {origin_name}".split(),
+        check=True,
+        capture_output=True,
+        cwd=repo.working_tree_dir,
+    )
+    for line in res.stdout.decode("utf-8").splitlines():
+        if line.strip().startswith("HEAD branch:"):
+            return line.replace("HEAD branch:", "").strip()
+
+    raise NotImplementedError(f"No remote called {origin_name!r}")

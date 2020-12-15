@@ -1,6 +1,6 @@
 import click
 
-from gg.utils import error_out, info_out
+from gg.utils import error_out, info_out, get_default_branch
 from gg.state import read
 from gg.main import cli, pass_config
 from gg.builtins.branches.gg_branches import find
@@ -15,7 +15,9 @@ def cleanup(config, searchstring, force=False):
     repo = config.repo
 
     state = read(config.configfile)
-    default_branch = state.get("DEFAULT_BRANCH", "master")
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    # default_branch = state.get("DEFAULT_BRANCH", "master")
+    default_branch = get_default_branch(repo, origin_name)
 
     branches_ = list(find(repo, searchstring))
     if not branches_:

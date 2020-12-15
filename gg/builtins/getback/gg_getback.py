@@ -1,6 +1,6 @@
 import click
 
-from gg.utils import error_out, info_out
+from gg.utils import error_out, info_out, get_default_branch
 from gg.state import read
 from gg.main import cli, pass_config
 
@@ -14,7 +14,8 @@ def getback(config, force=False):
     repo = config.repo
 
     state = read(config.configfile)
-    default_branch = state.get("DEFAULT_BRANCH", "master")
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    default_branch = get_default_branch(repo, origin_name)
     active_branch = repo.active_branch
     if active_branch.name == default_branch:
         error_out(f"You're already on the {default_branch} branch.")
@@ -28,8 +29,6 @@ def getback(config, force=False):
 
     branch_name = active_branch.name
 
-    state = read(config.configfile)
-    origin_name = state.get("ORIGIN_NAME", "origin")
     upstream_remote = None
     fork_remote = None
     for remote in repo.remotes:

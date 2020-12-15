@@ -1,6 +1,6 @@
-from gg.utils import error_out, success_out
-from gg.state import read
 from gg.main import cli, pass_config
+from gg.state import read
+from gg.utils import error_out, get_default_branch, success_out
 
 
 @cli.command()
@@ -10,7 +10,8 @@ def mastermerge(config):
     repo = config.repo
 
     state = read(config.configfile)
-    default_branch = state.get("DEFAULT_BRANCH", "master")
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    default_branch = get_default_branch(repo, origin_name)
 
     active_branch = repo.active_branch
     if active_branch.name == default_branch:
@@ -24,7 +25,6 @@ def mastermerge(config):
             )
         )
 
-    origin_name = state.get("ORIGIN_NAME", "origin")
     upstream_remote = None
     for remote in repo.remotes:
         if remote.name == origin_name:

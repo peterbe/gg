@@ -1,16 +1,22 @@
 # -*- coding: utf-8 -*-
 
 import os
-import time
 import re
+import time
 
-import git
 import click
-
-from gg.utils import error_out, info_out, success_out, is_github, is_bugzilla
-from gg.state import read, load
-from gg.main import cli, pass_config
+import git
 from gg.builtins import github
+from gg.main import cli, pass_config
+from gg.state import load, read
+from gg.utils import (
+    error_out,
+    get_default_branch,
+    info_out,
+    is_bugzilla,
+    is_github,
+    success_out,
+)
 
 
 # a chang.
@@ -27,11 +33,15 @@ def commit(config, no_verify):
     """Commit the current branch with all files."""
     repo = config.repo
 
+    state = read(config.configfile)
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    default_branch = get_default_branch(repo, origin_name)
+
     active_branch = repo.active_branch
-    if active_branch.name == "master":
+    if active_branch.name == default_branch:
         error_out(
-            "Can't commit when on the master branch. "
-            "You really ought to do work in branches."
+            f"Can't commit when on the {default_branch} branch. "
+            f"You really ought to do work in branches."
         )
 
     now = time.time()
@@ -234,7 +244,7 @@ def commit(config, no_verify):
         # If no known Pull Request exists, make a link to create a new one.
         github_url = "https://github.com/{}/{}/compare/{}:{}...{}:{}?expand=1"
         github_url = github_url.format(
-            org, repo, org, "master", state["FORK_NAME"], active_branch.name
+            org, repo, org, default_branch, state["FORK_NAME"], active_branch.name
         )
         print("Now, to make a Pull Request, go to:")
         print("")
