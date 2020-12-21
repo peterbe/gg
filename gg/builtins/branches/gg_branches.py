@@ -2,10 +2,8 @@ import datetime
 
 import click
 import git
-
-from gg.utils import error_out, info_out, success_out
-
 from gg.main import cli, pass_config
+from gg.utils import error_out, info_out, success_out, warning_out
 
 
 class InvalidRemoteName(Exception):
@@ -59,9 +57,9 @@ def branches(config, searchstring=""):
             if check_it_out:
                 branches_[0].checkout()
     elif searchstring:
-        error_out(f"Found no branches matching {searchstring!r}.")
+        warning_out(f"Found no branches matching {searchstring!r}.")
     else:
-        error_out("Found no branches.")
+        warning_out("Found no branches.")
 
 
 def find(repo, searchstring, exact=False):
@@ -122,41 +120,31 @@ def get_merged_branches(repo):
 
 def print_list(heads, merged_names):
     def wrap(head):
-        try:
-            log = head.log()
-        except ValueError as exception:
-            # https://github.com/gitpython-developers/GitPython/issues/758
-            return {
-                "head": head,
-                "info": {"date": datetime.datetime.utcnow()},
-                "error": str(exception),
-            }
-        try:
-            most_recent = log[-1]
-        except IndexError:
-            return {"head": head, "info": {"date": datetime.datetime.utcnow()}}
+        commit = head.commit
         return {
             "head": head,
-            "info": {
-                "date": datetime.datetime.utcfromtimestamp(most_recent.time[0]),
-                "message": most_recent.message,
-                "oldhexsha": most_recent.oldhexsha,
-            },
+            "info": {"date": commit.committed_datetime, "message": commit.message},
         }
 
     def format_age(dt):
-        delta = datetime.datetime.utcnow() - dt
-        return str(delta)
+        # This `dt` is timezone aware. So cheat, so we don't need to figure out
+        # our timezone is.
+        delta = datetime.datetime.utcnow().timestamp() - dt.timestamp()
+        return str(datetime.timedelta(seconds=delta))
 
     def format_msg(message):
+        message = message.strip().replace("\n", "\\n")
         if len(message) > 80:
             return message[:76] + "…"
         return message
 
     wrapped = sorted(
-        [wrap(head) for head in heads], key=lambda x: x["info"].get("date")
+        [wrap(head) for head in heads],
+        key=lambda x: x["info"].get("date"),
+        reverse=True,
     )
-    for each in wrapped:
+    cutoff = 10
+    for each in wrapped[:10]:
         info_out("".center(80, "-"))
         success_out(
             each["head"].name
@@ -168,3 +156,8 @@ def print_list(heads, merged_names):
         info_out("\t" + format_age(each["info"]["date"]))
         info_out("\t" + format_msg(each["info"].get("message", "*no commit yet*")))
         info_out("")
+
+    if len(heads) > cutoff:
+        warning_out(
+            f"Note! Found total of {len(heads)} but only showing {cutoff} most recent."
+        )

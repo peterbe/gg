@@ -29,6 +29,10 @@ def success_out(msg):
     click.echo(click.style(msg, fg="green"))
 
 
+def warning_out(msg):
+    click.echo(click.style(msg, fg="yellow"))
+
+
 def info_out(msg):
     click.echo(msg)
 
