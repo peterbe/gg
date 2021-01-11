@@ -28,8 +28,15 @@ from gg.utils import (
     is_flag=True,
     help="This option bypasses the pre-commit and commit-msg hooks.",
 )
+@click.option(
+    "-y",
+    "--yes",
+    default=False,
+    is_flag=True,
+    help="Immediately say yes to any questions",
+)
 @pass_config
-def commit(config, no_verify):
+def commit(config, no_verify, yes):
     """Commit the current branch with all files."""
     repo = config.repo
 
@@ -125,7 +132,7 @@ def commit(config, no_verify):
     if data["bugnumber"]:
         question = 'Add the "fixes" mention? [N/y] '
         fixes = input(question).lower().strip()
-        if fixes in ("y", "yes"):
+        if fixes in ("y", "yes") or yes:
             if is_bugzilla(data):
                 msg = "fixes " + msg
             elif is_github(data):
@@ -146,14 +153,14 @@ def commit(config, no_verify):
     for x in repo.index.diff(repo.head.commit):
         files_new.append(x.b_path)
 
-    proceed = True
+    dont_proceed = True
     if not (files_added or files_removed or files_new):
         info_out("No files to add or remove.")
-        proceed = False
-        if input("Proceed anyway? [Y/n] ").lower().strip() == "n":
-            proceed = True
+        dont_proceed = True
+        if not yes and input("Proceed anyway? [Y/n] ").lower().strip() == "n":
+            return 0
 
-    if proceed:
+    if not dont_proceed:
         if not repo.is_dirty():
             error_out("Branch is not dirty. There is nothing to commit.")
         if files_added:
@@ -191,9 +198,14 @@ def commit(config, no_verify):
     except IndexError:
         error_out("There is no remote called '{}'".format(state["FORK_NAME"]))
 
-    push_for_you = (
-        input("Push branch to {}? [Y/n] ".format(state["FORK_NAME"])).lower().strip()
-    )
+    if yes:
+        push_for_you = "yes"
+    else:
+        push_for_you = (
+            input("Push branch to {}? [Y/n] ".format(state["FORK_NAME"]))
+            .lower()
+            .strip()
+        )
     if push_for_you not in ("n", "no"):
         # destination = repo.remotes[state["FORK_NAME"]]
         (pushed,) = destination.push()
@@ -205,7 +217,7 @@ def commit(config, no_verify):
             error_out('The push was rejected ("{}")'.format(pushed.summary), False)
 
             try_force_push = input("Try to force push? [Y/n] ").lower().strip()
-            if try_force_push not in ("no", "n"):
+            if yes or try_force_push not in ("no", "n"):
                 (pushed,) = destination.push(force=True)
                 info_out(pushed.summary)
             else:
