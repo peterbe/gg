@@ -153,14 +153,14 @@ def commit(config, no_verify, yes):
     for x in repo.index.diff(repo.head.commit):
         files_new.append(x.b_path)
 
-    dont_proceed = True
+    proceed = True
     if not (files_added or files_removed or files_new):
         info_out("No files to add or remove.")
-        dont_proceed = True
-        if not yes and input("Proceed anyway? [Y/n] ").lower().strip() == "n":
-            return 0
+        proceed = False
+        if input("Proceed anyway? [Y/n] ").lower().strip() == "n":
+            proceed = True
 
-    if not dont_proceed:
+    if proceed:
         if not repo.is_dirty():
             error_out("Branch is not dirty. There is nothing to commit.")
         if files_added:
