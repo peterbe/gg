@@ -11,9 +11,16 @@ class InvalidRemoteName(Exception):
 
 
 @cli.command()
+@click.option(
+    "-y",
+    "--yes",
+    default=False,
+    is_flag=True,
+    help="Immediately say yes to any questions",
+)
 @click.argument("searchstring", default="")
 @pass_config
-def branches(config, searchstring=""):
+def branches(config, yes=False, searchstring=""):
     """List all branches. And if exactly 1 found, offer to check it out."""
     repo = config.repo
 
@@ -51,10 +58,12 @@ def branches(config, searchstring=""):
             branch_name = branches_[0].name
             if len(branch_name) > 50:
                 branch_name = branch_name[:47] + "…"
-            check_it_out = (
-                input(f"Check out {branch_name!r}? [Y/n] ").lower().strip() != "n"
-            )
-            if check_it_out:
+
+            if not yes:
+                check_it_out = (
+                    input(f"Check out {branch_name!r}? [Y/n] ").lower().strip() != "n"
+                )
+            if yes or check_it_out:
                 branches_[0].checkout()
     elif searchstring:
         warning_out(f"Found no branches matching {searchstring!r}.")
