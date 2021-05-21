@@ -47,6 +47,7 @@ from .builtins import bugzilla  # noqa
 from .builtins import github  # noqa
 from .builtins import config as _  # noqa
 from .builtins.commit import gg_commit  # noqa
+from .builtins.pr import gg_pr  # noqa
 from .builtins.merge import gg_merge  # noqa
 from .builtins.mastermerge import gg_mastermerge  # noqa
 from .builtins.start import gg_start  # noqa

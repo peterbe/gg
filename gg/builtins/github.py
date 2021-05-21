@@ -148,3 +148,21 @@ def find_pull_requests(config, org, repo, **params):
     response = requests.get(url, params, headers=headers)
     if response.status_code == 200:
         return response.json()
+
+
+def get_pull_request(config, org, repo, number):
+    base_url = GITHUB_URL
+    headers = {}
+    state = read(config.configfile)
+    credentials = state.get("GITHUB")
+    if credentials:
+        headers["Authorization"] = f"token {credentials['token']}"
+        if config.verbose:
+            info_out(f'Using API token: {credentials["token"][:10] + "…"}')
+    url = urllib.parse.urljoin(base_url, f"/repos/{org}/{repo}/pulls/{number}")
+    if config.verbose:
+        info_out(f"GitHub URL: {url}")
+    assert url.startswith("https://"), url
+    response = requests.get(url, headers=headers)
+    if response.status_code == 200:
+        return response.json()
