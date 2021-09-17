@@ -10,6 +10,9 @@ class InvalidRemoteName(Exception):
     """when a remote doesn't exist"""
 
 
+DEFAULT_CUTOFF = 10
+
+
 @cli.command()
 @click.option(
     "-y",
@@ -18,9 +21,16 @@ class InvalidRemoteName(Exception):
     is_flag=True,
     help="Immediately say yes to any questions",
 )
+@click.option(
+    "-n",
+    "--cutoff",
+    default=DEFAULT_CUTOFF,
+    help="Max. number of branches to show",
+    show_default=True,
+)
 @click.argument("searchstring", default="")
 @pass_config
-def branches(config, yes=False, searchstring=""):
+def branches(config, yes=False, searchstring="", cutoff=DEFAULT_CUTOFF):
     """List all branches. And if exactly 1 found, offer to check it out."""
     repo = config.repo
 
@@ -49,7 +59,7 @@ def branches(config, yes=False, searchstring=""):
     if branches_:
         merged = get_merged_branches(repo)
         info_out("Found existing branches...")
-        print_list(branches_, merged)
+        print_list(branches_, merged, cutoff=cutoff)
         if len(branches_) == 1 and searchstring:
             # If the found branch is the current one, error
             active_branch = repo.active_branch
@@ -127,7 +137,7 @@ def get_merged_branches(repo):
     return [x.split()[-1] for x in output.splitlines() if x.strip()]
 
 
-def print_list(heads, merged_names):
+def print_list(heads, merged_names, cutoff=10):
     def wrap(head):
         commit = head.commit
         return {
@@ -152,8 +162,8 @@ def print_list(heads, merged_names):
         key=lambda x: x["info"].get("date"),
         reverse=True,
     )
-    cutoff = 10
-    for each in wrapped[:10]:
+
+    for each in wrapped[:cutoff]:
         info_out("".center(80, "-"))
         success_out(
             each["head"].name
