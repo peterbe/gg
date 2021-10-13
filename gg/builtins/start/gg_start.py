@@ -94,7 +94,10 @@ def get_summary(config, bugnumber):
         ) = github_url_regex.search(bugnumber.split("#")[0]).groups()
         id_ = int(id_)
         title, url = github.get_title(config, org, repo, id_)
-        return title.strip(), id_, url
+        if title:
+            return title.strip(), id_, url
+        else:
+            return None, None, None
 
     # If it's a number it can be either a github issue or a bugzilla bug
     if bugnumber.isdigit():

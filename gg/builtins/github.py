@@ -88,6 +88,7 @@ def get_title(config, org, repo, number):
         info_out(f"GitHub URL: {url}")
     assert url.startswith("https://"), url
     response = requests.get(url, headers=headers)
+    response.raise_for_status()
     if response.status_code == 200:
         data = response.json()
         return data["title"], data["html_url"]
