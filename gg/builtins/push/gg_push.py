@@ -2,7 +2,7 @@ import git
 import click
 
 from gg.utils import error_out, info_out, success_out
-from gg.state import read
+from gg.state import read, load_config
 from gg.main import cli, pass_config
 
 
@@ -28,11 +28,17 @@ def push(config, force=False):
         return 0
 
     try:
-        repo.remotes[state["FORK_NAME"]]
-    except IndexError:
-        error_out("There is no remote called '{}'".format(state["FORK_NAME"]))
+        push_to_origin = load_config(config.configfile, "push_to_origin")
+    except KeyError:
+        push_to_origin = False
 
-    destination = repo.remotes[state["FORK_NAME"]]
+        try:
+            repo.remotes[state["FORK_NAME"]]
+        except IndexError:
+            error_out("There is no remote called '{}'".format(state["FORK_NAME"]))
+
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    destination = repo.remotes[origin_name if push_to_origin else state["FORK_NAME"]]
     if force:
         (pushed,) = destination.push(force=True)
         info_out(pushed.summary)

@@ -8,7 +8,7 @@ import click
 import git
 from gg.builtins import github
 from gg.main import cli, pass_config
-from gg.state import load, read
+from gg.state import load, read, load_config
 from gg.utils import (
     error_out,
     get_default_branch,
@@ -19,7 +19,6 @@ from gg.utils import (
 )
 
 
-# a chang.
 @cli.command()
 @click.option(
     "-n",
@@ -112,6 +111,16 @@ def commit(config, no_verify, yes):
     state = read(config.configfile)
 
     try:
+        push_to_origin = load_config(config.configfile, "push_to_origin")
+    except KeyError:
+        push_to_origin = False
+
+    try:
+        fixes_message = load_config(config.configfile, "fixes_message")
+    except KeyError:
+        fixes_message = True
+
+    try:
         data = load(config.configfile, active_branch.name)
     except KeyError:
         error_out(
@@ -127,9 +136,10 @@ def commit(config, no_verify, yes):
             msg = input('"{}" '.format(msg)).strip() or msg
         elif is_github(data):
             msg = input('"{}" '.format(msg)).strip() or msg
-            msg += "\n\nPart of #{}".format(data["bugnumber"])
+            if fixes_message:
+                msg += "\n\nPart of #{}".format(data["bugnumber"])
 
-    if data["bugnumber"]:
+    if data["bugnumber"] and fixes_message:
         question = 'Add the "fixes" mention? [N/y] '
         fixes = input(question).lower().strip()
         if fixes in ("y", "yes") or yes:
@@ -193,35 +203,44 @@ def commit(config, no_verify, yes):
         info_out("Can't help you push the commit. Please run: gg config --help")
         return 0
 
-    try:
-        destination = repo.remotes[state["FORK_NAME"]]
-    except IndexError:
-        error_out("There is no remote called '{}'".format(state["FORK_NAME"]))
+    if push_to_origin:
+        try:
+            repo.remotes[origin_name]
+        except IndexError:
+            error_out(f"There is no remote called {origin_name!r}")
+    else:
+        try:
+            repo.remotes[state["FORK_NAME"]]
+        except IndexError:
+            error_out(f"There is no remote called {state['FORK_NAME']!r}")
+
+    remote_name = origin_name if push_to_origin else state["FORK_NAME"]
 
     if yes:
         push_for_you = "yes"
     else:
-        push_for_you = (
-            input("Push branch to {}? [Y/n] ".format(state["FORK_NAME"]))
-            .lower()
-            .strip()
-        )
+        push_for_you = input(f"Push branch to {remote_name!r}? [Y/n] ").lower().strip()
     if push_for_you not in ("n", "no"):
         # destination = repo.remotes[state["FORK_NAME"]]
-        (pushed,) = destination.push()
-        # Was it rejected?
-        if (
-            pushed.flags & git.remote.PushInfo.REJECTED
-            or pushed.flags & git.remote.PushInfo.REMOTE_REJECTED
-        ):
-            error_out('The push was rejected ("{}")'.format(pushed.summary), False)
+        # refspec = f"{origin_name}:{active_branch.name}"
+        # print("refspec:", refspec)
+        # (pushed,) = destination.push(refspec=refspec)
+        # (pushed,) = destination.push()
+        push_output = repo.git.push("--set-upstream", remote_name, active_branch.name)
+        print(push_output)
+        # # Was it rejected?
+        # if (
+        #     pushed.flags & git.remote.PushInfo.REJECTED
+        #     or pushed.flags & git.remote.PushInfo.REMOTE_REJECTED
+        # ):
+        #     error_out(f"The push was rejected ({pushed.summary!r})", False)
 
-            try_force_push = input("Try to force push? [Y/n] ").lower().strip()
-            if yes or try_force_push not in ("no", "n"):
-                (pushed,) = destination.push(force=True)
-                info_out(pushed.summary)
-            else:
-                return 0
+        #     try_force_push = input("Try to force push? [Y/n] ").lower().strip()
+        #     if yes or try_force_push not in ("no", "n"):
+        #         (pushed,) = destination.push(force=True)
+        #         info_out(pushed.summary)
+        #     else:
+        #         return 0
 
     else:
         # If you don't want to push, then don't bother with GitHub
@@ -243,7 +262,7 @@ def commit(config, no_verify, yes):
     # Search for an existing open pull request, and remind us of the link
     # to it.
     search = {
-        "head": "{}:{}".format(state["FORK_NAME"], active_branch.name),
+        "head": f"{remote_name}:{active_branch.name}",
         "state": "open",
     }
     for pull_request in github.find_pull_requests(config, org, repo, **search):
@@ -254,10 +273,21 @@ def commit(config, no_verify, yes):
         break
     else:
         # If no known Pull Request exists, make a link to create a new one.
-        github_url = "https://github.com/{}/{}/compare/{}:{}...{}:{}?expand=1"
-        github_url = github_url.format(
-            org, repo, org, default_branch, state["FORK_NAME"], active_branch.name
-        )
+        if remote_name == origin.name:
+            github_url = "https://github.com/{}/{}/compare/{}...{}?expand=1".format(
+                org, repo, default_branch, active_branch.name
+            )
+        else:
+            github_url = (
+                "https://github.com/{}/{}/compare/{}:{}...{}:{}?expand=1".format(
+                    org,
+                    repo,
+                    org,
+                    default_branch,
+                    remote_name,
+                    active_branch.name,
+                )
+            )
         print("Now, to make a Pull Request, go to:")
         print("")
         success_out(github_url)

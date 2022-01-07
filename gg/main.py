@@ -46,6 +46,7 @@ def cli(config, configfile, verbose):
 from .builtins import bugzilla  # noqa
 from .builtins import github  # noqa
 from .builtins import config as _  # noqa
+from .builtins import local_config as _  # noqa
 from .builtins.commit import gg_commit  # noqa
 from .builtins.pr import gg_pr  # noqa
 from .builtins.merge import gg_merge  # noqa

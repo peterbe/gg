@@ -30,9 +30,22 @@ def load(configfile, branch_name):
     return read(configfile)[key]
 
 
+def load_config(configfile, key):
+    # like read() but returning specifically the state for the current repo
+    key = f"{get_repo_name()}:_config:{key}"
+    return read(configfile)[key]
+
+
 def update(configfile, data):
     state = read(configfile)
     state.update(data)
+    write(configfile, state)
+
+
+def update_config(configfile, **kwargs):
+    state = read(configfile)
+    for key, value in kwargs.items():
+        state[f"{get_repo_name()}:_config:{key}"] = value
     write(configfile, state)
 
 
