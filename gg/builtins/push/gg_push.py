@@ -44,19 +44,19 @@ def push(config, force=False):
         info_out(pushed.summary)
     else:
         (pushed,) = destination.push()
-        print("PUSHED...")
-        # print(pushed)
-        # print(pushed.flags)
-    for enum_name in [
-        "DELETED",
-        "ERROR",
-        "FAST_FORWARD",
-        "NEW_HEAD",
-        "NEW_TAG",
-        "NO_MATCH",
-        "REMOTE_FAILURE",
-    ]:
-        print(f"{enum_name}?:", pushed.flags & getattr(git.remote.PushInfo, enum_name))
+        # print("PUSHED...")
+    # for enum_name in [
+    #     "DELETED",
+    #     "ERROR",
+    #     "FAST_FORWARD",
+    #     "NEW_HEAD",
+    #     "NEW_TAG",
+    #     "NO_MATCH",
+    #     "REMOTE_FAILURE",
+    # ]:
+    #     print(
+    #         f"{enum_name}?:", pushed.flags & getattr(git.remote.PushInfo, enum_name)
+    #     )
 
     if pushed.flags & git.remote.PushInfo.FORCED_UPDATE:
         success_out(f"Successfully force pushed to {destination}")

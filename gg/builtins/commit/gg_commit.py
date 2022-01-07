@@ -221,26 +221,8 @@ def commit(config, no_verify, yes):
     else:
         push_for_you = input(f"Push branch to {remote_name!r}? [Y/n] ").lower().strip()
     if push_for_you not in ("n", "no"):
-        # destination = repo.remotes[state["FORK_NAME"]]
-        # refspec = f"{origin_name}:{active_branch.name}"
-        # print("refspec:", refspec)
-        # (pushed,) = destination.push(refspec=refspec)
-        # (pushed,) = destination.push()
         push_output = repo.git.push("--set-upstream", remote_name, active_branch.name)
         print(push_output)
-        # # Was it rejected?
-        # if (
-        #     pushed.flags & git.remote.PushInfo.REJECTED
-        #     or pushed.flags & git.remote.PushInfo.REMOTE_REJECTED
-        # ):
-        #     error_out(f"The push was rejected ({pushed.summary!r})", False)
-
-        #     try_force_push = input("Try to force push? [Y/n] ").lower().strip()
-        #     if yes or try_force_push not in ("no", "n"):
-        #         (pushed,) = destination.push(force=True)
-        #         info_out(pushed.summary)
-        #     else:
-        #         return 0
 
     else:
         # If you don't want to push, then don't bother with GitHub
