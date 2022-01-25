@@ -56,12 +56,13 @@ def pr(config):
     # Search for an existing open pull request, and remind us of the link
     # to it.
     if push_to_origin:
-        head = active_branch.name
+        head = f"{org}:{active_branch.name}"
     else:
         head = f"{state['FORK_NAME']}:{active_branch.name}"
+
     search = {
         "head": head,
-        "state": "open",
+        "state": "all",
     }
     for pull_request in github.find_pull_requests(config, org, repo, **search):
         print("Pull Request:")
@@ -79,9 +80,6 @@ def pr(config):
         full_pull_request = github.get_pull_request(
             config, org, repo, pull_request["number"]
         )
-        # from pprint import pprint
-
-        # pprint(full_pull_request)
 
         print("Mergeable?", full_pull_request.get("mergeable", "*not known*"))
         print("Updated", full_pull_request["updated_at"])
