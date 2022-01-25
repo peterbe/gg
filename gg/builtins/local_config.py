@@ -1,4 +1,5 @@
 import json
+import os
 
 import click
 
@@ -18,8 +19,19 @@ from gg.main import cli, pass_config
     default=False,
     help="Enable or disable the 'fixes' functionality in commits",
 )
+@click.option(
+    "--toggle-username-branches",
+    is_flag=True,
+    default=None,
+    help=f"Toggles if branches should prefix by your username ({os.getlogin()})",
+)
 @pass_config
-def local_config(config, push_to_origin="", toggle_fixes_message=False):
+def local_config(
+    config,
+    push_to_origin="",
+    toggle_fixes_message=False,
+    toggle_username_branches=None,
+):
     """Setting configuration options per repo name"""
     if push_to_origin:
         try:
@@ -41,3 +53,14 @@ def local_config(config, push_to_origin="", toggle_fixes_message=False):
         new_value = not before
         update_config(config.configfile, fixes_message=new_value)
         print(f"fixes_message after: {new_value}")
+
+    if toggle_username_branches is not None:
+        try:
+            before = load_config(config.configfile, "username_branches")
+            print(f"username_branches before: {before}")
+        except KeyError:
+            print("username_branches before: not set")
+            before = False  # the default
+        new_value = not before
+        update_config(config.configfile, username_branches=new_value)
+        print(f"username_branches after:  {new_value}")

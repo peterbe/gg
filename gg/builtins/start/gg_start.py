@@ -1,3 +1,4 @@
+import os
 import re
 import getpass
 import urllib
@@ -5,7 +6,7 @@ import urllib
 import click
 
 from gg.utils import error_out, info_out, is_github
-from gg.state import save, read
+from gg.state import save, read, load_config
 from gg.main import cli, pass_config
 from gg.builtins import bugzilla
 from gg.builtins import github
@@ -19,6 +20,11 @@ def start(config, bugnumber=""):
     """Create a new topic branch."""
     repo = config.repo
 
+    try:
+        username_branches = load_config(config.configfile, "username_branches")
+    except KeyError:
+        username_branches = False
+
     if bugnumber:
         summary, bugnumber, url = get_summary(config, bugnumber)
     else:
@@ -31,11 +37,13 @@ def start(config, bugnumber=""):
         summary = input("Summary: ").strip()
 
     branch_name = ""
+    if username_branches:
+        branch_name += f"{os.getlogin()}-"
     if bugnumber:
         if is_github({"bugnumber": bugnumber, "url": url}):
-            branch_name = "{}-".format(bugnumber)
+            branch_name += f"{bugnumber}-"
         else:
-            branch_name = "{}-".format(bugnumber)
+            branch_name += f"{bugnumber}-"
 
     def clean_branch_name(string):
         string = re.sub(r"\s+", " ", string)

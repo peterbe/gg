@@ -4,7 +4,7 @@ import re
 
 from gg.builtins import github
 from gg.main import cli, pass_config
-from gg.state import read
+from gg.state import read, load_config
 from gg.utils import (
     error_out,
     get_default_branch,
@@ -28,6 +28,11 @@ def pr(config):
 
     state = read(config.configfile)
 
+    try:
+        push_to_origin = load_config(config.configfile, "push_to_origin")
+    except KeyError:
+        push_to_origin = False
+
     # try:
     #     data = load(config.configfile, active_branch.name)
     # except KeyError:
@@ -50,8 +55,12 @@ def pr(config):
 
     # Search for an existing open pull request, and remind us of the link
     # to it.
+    if push_to_origin:
+        head = active_branch.name
+    else:
+        head = f"{state['FORK_NAME']}:{active_branch.name}"
     search = {
-        "head": f"{state['FORK_NAME']}:{active_branch.name}",
+        "head": head,
         "state": "open",
     }
     for pull_request in github.find_pull_requests(config, org, repo, **search):

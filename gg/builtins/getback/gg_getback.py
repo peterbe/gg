@@ -1,7 +1,7 @@
 import click
 
 from gg.utils import error_out, info_out, get_default_branch
-from gg.state import read
+from gg.state import read, load_config
 from gg.main import cli, pass_config
 
 
@@ -21,11 +21,8 @@ def getback(config, force=False):
         error_out(f"You're already on the {default_branch} branch.")
 
     if repo.is_dirty():
-        error_out(
-            'Repo is "dirty". ({})'.format(
-                ", ".join([repr(x.b_path) for x in repo.index.diff(None)])
-            )
-        )
+        dirty_paths = ", ".join([repr(x.b_path) for x in repo.index.diff(None)])
+        error_out(f'Repo is "dirty". ({dirty_paths})')
 
     branch_name = active_branch.name
 
@@ -37,7 +34,7 @@ def getback(config, force=False):
             upstream_remote = remote
             break
     if not upstream_remote:
-        error_out("No remote called {!r} found".format(origin_name))
+        error_out(f"No remote called {origin_name!r} found")
 
     # Check out default branch
     repo.heads[default_branch].checkout()
@@ -70,11 +67,20 @@ def getback(config, force=False):
     else:
         repo.git.branch("-D", branch_name)
 
+    try:
+        push_to_origin = load_config(config.configfile, "push_to_origin")
+    except KeyError:
+        push_to_origin = False
+    remote_name = origin_name if push_to_origin else state["FORK_NAME"]
+
     fork_remote = None
     for remote in repo.remotes:
-        if remote.name == state.get("FORK_NAME"):
+        if remote.name == remote_name:
             fork_remote = remote
             break
+    else:
+        info_out(f"Never found the remote {remote_name}")
+
     if fork_remote:
         fork_remote.push(":" + branch_name)
         info_out("Remote branch on fork deleted too.")
