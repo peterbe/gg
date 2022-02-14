@@ -1,6 +1,6 @@
 import click
 
-from gg.utils import error_out, info_out, get_default_branch
+from gg.utils import error_out, info_out, get_default_branch, warning_out
 from gg.state import read
 from gg.main import cli, pass_config
 from gg.builtins.branches.gg_branches import find
@@ -85,5 +85,8 @@ def cleanup(config, searchstring, force=False):
             fork_remote = remote
             break
     if fork_remote:
-        fork_remote.push(":" + branch_name)
-        info_out("Remote branch on fork deleted too.")
+        try:
+            fork_remote.push(":" + branch_name)
+            info_out("Remote branch on fork deleted too.")
+        except Exception as e:
+            warning_out(f"Error deleting remote branch: {e.stderr or e.stdout or e}")

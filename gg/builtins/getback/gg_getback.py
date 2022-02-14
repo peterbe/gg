@@ -1,6 +1,6 @@
 import click
 
-from gg.utils import error_out, info_out, get_default_branch
+from gg.utils import error_out, info_out, get_default_branch, warning_out
 from gg.state import read, load_config
 from gg.main import cli, pass_config
 
@@ -82,5 +82,8 @@ def getback(config, force=False):
         info_out(f"Never found the remote {remote_name}")
 
     if fork_remote:
-        fork_remote.push(":" + branch_name)
-        info_out("Remote branch on fork deleted too.")
+        try:
+            fork_remote.push(":" + branch_name)
+            info_out("Remote branch on fork deleted too.")
+        except Exception as e:
+            warning_out(f"Error deleting remote branch: {e.stderr or e.stdout or e}")
