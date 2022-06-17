@@ -148,8 +148,19 @@ def print_list(heads, merged_names, cutoff=10):
     def format_age(dt):
         # This `dt` is timezone aware. So cheat, so we don't need to figure out
         # our timezone is.
-        delta = datetime.datetime.utcnow().timestamp() - dt.timestamp()
-        return str(datetime.timedelta(seconds=delta))
+        delta = datetime.timedelta(
+            seconds=datetime.datetime.utcnow().timestamp() - dt.timestamp()
+        )
+        if delta.days < 1:
+            seconds = delta.total_seconds()
+            minutes = seconds / 60
+            if seconds > 60 * 60:
+                hours = minutes / 60
+                return f"{hours:.0f} hours"
+            elif seconds > 60:
+                return f"{minutes:.0f} minutes"
+            return f"{seconds:.0f} seconds"
+        return str(delta)
 
     def format_msg(message):
         message = message.strip().replace("\n", "\\n")

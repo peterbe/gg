@@ -247,7 +247,10 @@ def commit(config, no_verify, yes):
         "head": f"{remote_name}:{active_branch.name}",
         "state": "open",
     }
-    for pull_request in github.find_pull_requests(config, org, repo, **search):
+    prs = github.find_pull_requests(config, org, repo, **search)
+    if prs is None:
+        error_out("Can't iterate over pull requests")
+    for pull_request in prs:
         print("Pull Request already created:")
         print("")
         print("\t", pull_request["html_url"])
