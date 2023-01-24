@@ -3,6 +3,7 @@ import datetime
 import click
 import git
 from gg.main import cli, pass_config
+from gg.state import read
 from gg.utils import error_out, info_out, success_out, warning_out
 
 
@@ -34,8 +35,17 @@ def branches(config, yes=False, searchstring="", cutoff=DEFAULT_CUTOFF):
     """List all branches. And if exactly 1 found, offer to check it out."""
     repo = config.repo
 
+    # state = read(config.configfile)
+    # origin_name = state.get("ORIGIN_NAME", "origin")
+
     try:
         branches_ = list(find(repo, searchstring))
+        if not branches_:
+            # Fetch from origin and try again
+            fetch_origin(config)
+            state = read(config.configfile)
+            origin_name = state.get("ORIGIN_NAME", "origin")
+            branches_ = list(find(repo, searchstring, search_remote=origin_name))
     except InvalidRemoteName as exception:
         remote_search_name = searchstring.split(":")[0]
         if remote_search_name in [x.name for x in repo.remotes]:
@@ -74,14 +84,35 @@ def branches(config, yes=False, searchstring="", cutoff=DEFAULT_CUTOFF):
                     input(f"Check out {branch_name!r}? [Y/n] ").lower().strip() != "n"
                 )
             if yes or check_it_out:
-                branches_[0].checkout()
+                if isinstance(branches_[0], git.RemoteReference):
+                    print(dir(branches_[0]))
+                    print(branches_[0].name)
+                    raise Exception("??")
+                else:
+                    branches_[0].checkout()
     elif searchstring:
         warning_out(f"Found no branches matching {searchstring!r}.")
     else:
         warning_out("Found no branches.")
 
 
-def find(repo, searchstring, exact=False):
+def fetch_origin(config):
+    repo = config.repo
+    state = read(config.configfile)
+    origin_name = state.get("ORIGIN_NAME", "origin")
+    upstream_remote = None
+    for remote in repo.remotes:
+        if remote.name == origin_name:
+            upstream_remote = remote
+            break
+    if not upstream_remote:
+        error_out(f"No remote called {origin_name!r} found")
+
+    info_out(f"Fetching origin {origin_name!r}")
+    upstream_remote.fetch()
+
+
+def find(repo, searchstring, exact=False, search_remote=None):
     # When you copy-to-clipboard from GitHub you get something like
     # 'peterbe:1545809-urllib3-1242' for example.
     # But first, it exists as a local branch, use that.
@@ -128,6 +159,17 @@ def find(repo, searchstring, exact=False):
                 if searchstring.lower() not in head.name.lower():
                     continue
         yield head
+
+    if search_remote:
+        remote_refs = repo.remote().refs
+        for ref in remote_refs:
+            _, rest = ref.name.split(f"{search_remote}/")
+            if exact:
+                print((rest, searchstring))
+                if searchstring.lower() == rest.lower():
+                    yield ref
+            elif searchstring.lower() in rest.lower():
+                yield ref
 
 
 def get_merged_branches(repo):

@@ -133,15 +133,17 @@ def commit(config, no_verify, yes):
     if data.get("bugnumber"):
         if is_bugzilla(data):
             msg = "bug {} - {}".format(data["bugnumber"], data["description"])
-            msg = input('"{}" '.format(msg)).strip() or msg
+            msg = not yes and input(f'"{msg}" ').strip() or msg
         elif is_github(data):
-            msg = input('"{}" '.format(msg)).strip() or msg
+            msg = not yes and input(f'"{msg}" ').strip() or msg
             if fixes_message:
                 msg += "\n\nPart of #{}".format(data["bugnumber"])
+    if yes:
+        print(msg)
 
     if data["bugnumber"] and fixes_message:
         question = 'Add the "fixes" mention? [N/y] '
-        fixes = input(question).lower().strip()
+        fixes = yes or input(question).lower().strip()
         if fixes in ("y", "yes") or yes:
             if is_bugzilla(data):
                 msg = "fixes " + msg
@@ -180,13 +182,16 @@ def commit(config, no_verify, yes):
         try:
             # Do it like this (instead of `repo.git.commit(msg)`)
             # so that git signing works.
-            commit = repo.git.commit(["-m", msg])
+            # commit = repo.git.commit(["-m", msg])
+            args = ["-m", msg]
+            if no_verify:
+                args.append("--no-verify")
+            commit = repo.git.commit(args)
         except git.exc.HookExecutionError as exception:
             if not no_verify:
                 info_out(
-                    "Commit hook failed ({}, exit code {})".format(
-                        exception.command, exception.status
-                    )
+                    f"Commit hook failed ({exception.command}, "
+                    f"exit code {exception.status})"
                 )
                 if exception.stdout:
                     error_out(exception.stdout)
