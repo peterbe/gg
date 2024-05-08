@@ -85,9 +85,10 @@ def branches(config, yes=False, searchstring="", cutoff=DEFAULT_CUTOFF):
                 )
             if yes or check_it_out:
                 if isinstance(branches_[0], git.RemoteReference):
-                    print(dir(branches_[0]))
-                    print(branches_[0].name)
-                    raise Exception("??")
+                    # print(dir(branches_[0]))
+                    # print(branches_[0].name)
+                    branches_[0].checkout()
+                    # raise Exception("??")
                 else:
                     branches_[0].checkout()
     elif searchstring:
