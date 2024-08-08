@@ -172,6 +172,10 @@ def commit(config, no_verify, yes):
         if input("Proceed anyway? [Y/n] ").lower().strip() == "n":
             proceed = True
 
+    if "Peterbe" in msg:
+        print(f"data={data}")
+        print(f"msg={msg!r}")
+        raise Exception("HOW DID THAT HAPPEN!?")
     if proceed:
         if not repo.is_dirty():
             error_out("Branch is not dirty. There is nothing to commit.")
@@ -202,7 +206,7 @@ def commit(config, no_verify, yes):
             else:
                 commit = index.commit(msg, skip_hooks=True)
 
-        success_out("Commit created {}".format(commit))
+        success_out(f"Commit created {commit}")
 
     if not state.get("FORK_NAME"):
         info_out("Can't help you push the commit. Please run: gg config --help")
